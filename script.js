@@ -68,7 +68,11 @@ class DistroComparator {
         let attributeType;
 
         if (typeof attributeValue === 'number') {
-            attributeType = 'number';
+            if (attributeValue <= 10) {
+                attributeType = 'scale';
+            } else {
+                attributeType = 'number';
+            }
         } else if (typeof attributeValue === 'boolean') {
             attributeType = 'boolean';
         } else if (Array.isArray(attributeValue)) {
@@ -144,7 +148,10 @@ class DistroComparator {
         label.textContent = `${labelText}:`;
         attributeDiv.appendChild(label);
 
-        // Create preference level slider
+        // Create preference level slider with labels
+        const sliderContainer = document.createElement('div');
+        sliderContainer.classList.add('slider-container');
+        
         const preferenceSlider = document.createElement('input');
         preferenceSlider.setAttribute('type', 'range');
         preferenceSlider.setAttribute('id', `${attributeName}-pref`);
@@ -152,7 +159,31 @@ class DistroComparator {
         preferenceSlider.setAttribute('min', '0');
         preferenceSlider.setAttribute('max', '4');
         preferenceSlider.setAttribute('value', '1'); // Default to "Don't care"
-        attributeDiv.appendChild(preferenceSlider);
+        preferenceSlider.setAttribute('step', '1');
+        sliderContainer.appendChild(preferenceSlider);
+
+        // Create labels for slider values
+        const sliderLabels = document.createElement('div');
+        sliderLabels.classList.add('slider-labels');
+        const priorityLabels = ['Not important', 'Don\'t care', 'Nice to have', 'Important', 'Non-negotiable'];
+        priorityLabels.forEach((label, index) => {
+            const span = document.createElement('span');
+            span.textContent = label;
+            span.dataset.value = index;
+            sliderLabels.appendChild(span);
+        });
+        sliderContainer.appendChild(sliderLabels);
+        attributeDiv.appendChild(sliderContainer);
+
+        // Highlight current selection
+        this.updateSliderLabel(sliderLabels, 1);
+
+        // Update labels when slider changes
+        preferenceSlider.addEventListener('input', () => {
+            const value = parseInt(preferenceSlider.value);
+            this.updateSliderLabel(sliderLabels, value);
+            this.filterDistros();
+        });
 
         // Create placeholder for value control
         const valueControlContainer = document.createElement('div');
@@ -160,9 +191,21 @@ class DistroComparator {
         attributeDiv.appendChild(valueControlContainer);
 
         // Render the appropriate value control
-        // Call the new renderValueControl that returns an element
         const valueControlElement = this.renderValueControl(attributeName, attributeType);
-        valueControlContainer.appendChild(valueControlElement); // Append the element directly
+        valueControlContainer.appendChild(valueControlElement);
+
+        // Create span to display the current value
+        const valueDisplay = document.createElement('span');
+        valueDisplay.classList.add('filter-value-display');
+        valueDisplay.textContent = valueControlElement.value;
+        valueControlContainer.appendChild(valueDisplay);
+
+        // Update the displayed value on input for number and scale types
+        if (attributeType === 'number' || attributeType === 'scale') {
+            valueControlElement.addEventListener('input', () => {
+                valueDisplay.textContent = valueControlElement.value;
+            });
+        }
 
         // Populate select options for array/string types after rendering
         if (attributeType === 'array' || attributeType === 'string') {
@@ -500,61 +543,150 @@ class DistroComparator {
     const table = document.createElement('table');
     table.className = 'distro-table';
 
-    // Get the keys from the first distro object to create the header
-    const rawHeaders = Object.keys(this.allDistros[0] || {});
-    console.log('renderTable: rawHeaders from allDistros[0]:', rawHeaders);
-    if (rawHeaders.length === 0) {
-        console.error('renderTable: No headers found from allDistros[0]. Cannot render table headers.');
-    }
+    // Define column groups
+    const columnGroups = [
+      { label: 'Actions', keys: ['actions'] },
+      { label: 'General Info', keys: ['name', 'description', 'website', 'based_on'] },
+      { label: 'System Requirements', keys: ['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'] },
+      { label: 'Non-Negotiable Criteria', keys: ['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_reliance', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'] },
+      { label: 'Important Criteria', keys: ['free_software_ideology', 'proprietary_software_required', 'sysadmin', 'sysadmin_vulnerability', 'illegal'] },
+      { label: 'Nice-To-Have Criteria', keys: ['security_vulnerability', 'active_community'] },
+      { label: 'Detailed Specifications', keys: ['ram_usage_idle', 'disk_space_installed', 'iso_size', 'boot_time', 'package_manager', 'desktop_environments', 'default_desktop', 'init_system', 'kernel', 'release_model', 'release_cycle_months', 'support_duration_years', 'update_frequency'] },
+      { label: 'Security & Privacy', keys: ['privacy_rating', 'security_rating', 'firewall_default', 'firewall', 'encryption_support', 'selinux_apparmor', 'automatic_updates'] },
+      { label: 'Hardware Compatibility', keys: ['wifi', 'bluetooth', 'touchscreen', 'hidpi', 'arm_', 'raspberry'] },
+      { label: 'Performance Metrics', keys: ['cpu_usage_idle', 'disk_io_performance', 'network_performance', 'gaming_performance'] },
+      { label: 'Usability', keys: ['beginner_friendliness', 'installer_difficulty', 'post_install_setup', 'gui_tools_availability', 'software_center_quality'] },
+      { label: 'Development & Professional Use', keys: ['development_tools', 'programming_languages_included', 'container_support', 'virtualization_support', 'server_suitability', 'enterprise_features'] },
+      { label: 'Multimedia & Creativity', keys: ['multimedia_codecs', 'audio_quality', 'video_editing_support', 'graphics_design_tools'] },
+      { label: 'Accessibility', keys: ['screen_reader_support', 'keyboard_navigation', 'high_contrast_themes', 'font_scaling'] },
+      { label: 'Localization', keys: ['languages_supported', 'rtl_language_support', 'regional_variants'] },
+      { label: 'Community & Ecosystem', keys: ['forum_activity', 'github_activity', 'commercial_support', 'third_party_repositories', 'flatpak_support', 'snap_support', 'appimage_support'] },
+      { label: 'Special Features', keys: ['live_usb_support', 'persistence_support', 'snapshot_rollback', 'immutable_system', 'unique_features', 'target_audience'] },
+      { label: 'Maintenance', keys: ['manual_intervention_frequency', 'breaking_changes_frequency', 'long_term_stability', 'backup_tools_included'] }
+    ];
 
-    const tableHead = table.createTHead();
-    const headerRow = tableHead.insertRow(0);
+    // Create table header with grouped columns
+    const thead = document.createElement('thead');
 
-    // Add "Actions" header FIRST
-    const actionsHeaderCell = document.createElement('th');
-    actionsHeaderCell.textContent = 'Actions';
-    headerRow.appendChild(actionsHeaderCell); // Appending it first to the empty row
-    console.log('renderTable: Appended "Actions" header first. Full tableHead.outerHTML:', tableHead.outerHTML);
+    // Group header row
+    const groupHeaderRow = document.createElement('tr');
+    columnGroups.forEach((group, groupIndex) => {
+      const th = document.createElement('th');
+      th.colSpan = group.keys.length;
+      th.dataset.originalColspan = group.keys.length; // Store original colspan
+      th.className = 'category-header';
+      th.textContent = group.label;
+      // Store group index for toggling
+      th.dataset.groupIndex = groupIndex;
+      if (groupIndex === 0) {
+        // First column ("Actions") is not collapsible
+        groupHeaderRow.appendChild(th);
+        return;
+      }
+      // Add arrow indicator for collapse/expand
+      const arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.textContent = ' ▼';
+      th.appendChild(arrow);
+      // Click event to toggle columns visibility
+      th.addEventListener('click', () => {
+        const isCollapsed = th.classList.toggle('collapsed');
+        arrow.textContent = isCollapsed ? ' ►' : ' ▼';
+        // Toggle hidden-column class on relevant header and body cells
+        const headerCells = table.querySelectorAll(`thead tr:nth-child(2) th[data-group-index="${groupIndex}"]`);
+        const bodyCells = table.querySelectorAll(`tbody td[data-group-index="${groupIndex}"]`);
+        
+        if (isCollapsed) {
+          // When collapsing, show only first column in group
+          headerCells.forEach((cell, idx) => {
+            cell.classList.toggle('hidden-column', idx !== 0);
+          });
+          bodyCells.forEach((cell, idx) => {
+            // Calculate column index within group (modulo group size)
+            const colIdx = idx % group.keys.length;
+            cell.classList.toggle('hidden-column', colIdx !== 0);
+          });
+          // Adjust group header colspan to match visible column
+          th.colSpan = 1;
+        } else {
+          // When expanding, show all columns
+          headerCells.forEach(cell => cell.classList.remove('hidden-column'));
+          bodyCells.forEach(cell => cell.classList.remove('hidden-column'));
+          // Restore original colspan
+          th.colSpan = parseInt(th.dataset.originalColspan);
+        }
+      });
+      groupHeaderRow.appendChild(th);
+    });
+    thead.appendChild(groupHeaderRow);
 
-
-    rawHeaders.forEach(headerText => {
-        const headerCell = document.createElement('th');
-        // Simple formatting: replace underscores with spaces and capitalize words
-        const formattedText = headerText.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-        headerCell.textContent = formattedText;
-        headerCell.dataset.sortKey = headerText; // Store raw key for sorting
-        headerCell.style.cursor = 'pointer';
-        // Add a class for potential styling of sortable headers
-        headerCell.classList.add('sortable-header');
-        // Add up/down arrows for sorting indication (initially hidden or neutral)
-        const sortIndicator = document.createElement('span');
-        sortIndicator.classList.add('sort-indicator');
-        sortIndicator.innerHTML = ' &#x2195;'; // Up-down arrow
-        headerCell.appendChild(sortIndicator);
-
-        headerCell.addEventListener('click', () => {
-            const oldSortBy = this.currentFilters.sortBy;
-            this.currentFilters.sortBy = headerText;
-            // Basic toggle for sort direction (can be expanded)
-            // For simplicity, this example doesn't store sort direction per column
-            // It just re-sorts. A more complex system would track asc/desc.
-            this.sortDistros();
-            this.renderTable(); // Re-render with sorted data
+    // Column header row
+    const headerRow = document.createElement('tr');
+    columnGroups.forEach((group, groupIndex) => {
+      group.keys.forEach(key => {
+        const th = document.createElement('th');
+        // Format header text
+        const formatted = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        th.textContent = formatted;
+        th.dataset.sortKey = key;
+        th.dataset.groupIndex = groupIndex;
+        th.className = 'sortable-header';
+        // Add sort indicator
+        const indicator = document.createElement('span');
+        indicator.className = 'sort-indicator';
+        indicator.innerHTML = ' &#x2195;';
+        th.appendChild(indicator);
+        // Sort event
+        th.addEventListener('click', () => {
+          this.currentFilters.sortBy = key;
+          this.sortDistros();
+          this.renderTable();
         });
-        headerRow.appendChild(headerCell);
-        console.log(`renderTable: Created header cell for "${headerText}":`, headerCell.outerHTML);
+        headerRow.appendChild(th);
+      });
     });
-    console.log('renderTable: Appended "Actions" header. Full tableHead.outerHTML:', tableHead.outerHTML);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-    const tableBody = table.createTBody();
-    // Create table rows
+    // Table body
+    const tbody = document.createElement('tbody');
     this.filteredDistros.forEach(distro => {
-      // Pass tableBody, distro, and the rawHeaders (keys for data cells)
-      this.createDistroRow(tableBody, distro, rawHeaders);
-    });
+      const row = document.createElement('tr');
+      columnGroups.forEach((group, groupIndex) => {
+        group.keys.forEach(key => {
+          const td = document.createElement('td');
+          td.dataset.groupIndex = groupIndex;
+          if (key === 'actions') {
+            const detailsBtn = document.createElement('button');
+            detailsBtn.textContent = 'Details';
+            detailsBtn.className = 'details-btn';
+            detailsBtn.addEventListener('click', () => this.showDetails(distro.name));
+            td.appendChild(detailsBtn);
 
+            const eliminateBtn = document.createElement('button');
+            eliminateBtn.textContent = 'Eliminate';
+            eliminateBtn.className = 'eliminate-btn';
+            eliminateBtn.addEventListener('click', () => this.eliminateDistro(distro.name));
+            td.appendChild(eliminateBtn);
+          } else {
+            const value = distro[key];
+            if (Array.isArray(value)) {
+              td.textContent = value.join(', ');
+            } else if (typeof value === 'boolean') {
+              td.textContent = value ? 'Yes' : 'No';
+            } else {
+              td.textContent = value != null ? String(value) : '';
+            }
+          }
+          row.appendChild(td);
+        });
+      });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+
+    // Append table to container
     tableContainer.appendChild(table);
-    console.log('renderTable: Table fully constructed and appended to container.');
   }
 
   createDistroRow(tableBody, distro, dataHeaders) {
@@ -736,6 +868,18 @@ class DistroComparator {
       notificationElement.remove();
     }, 3000);
     */
+  }
+
+  // Update slider label highlighting
+  updateSliderLabel(labelsContainer, value) {
+    const labels = labelsContainer.querySelectorAll('span');
+    labels.forEach((label, index) => {
+      if (index === value) {
+        label.classList.add('active');
+      } else {
+        label.classList.remove('active');
+      }
+    });
   }
 
   // Update statistics display

@@ -56,3 +56,15 @@ The website is now functional with mock data. Users can:
 The `.gitignore` file has been added to the project to ensure that temporary files, build artifacts, environment-specific configurations, and other non-essential files are not committed to the Git repository. This improves repository cleanliness and reduces potential conflicts.
 
 ---
+
+## 09/06/2025, 12:57:00 am (Europe/Madrid)
+* Implemented priority slider functionality for filter controls.
+* Added sliders to filter settings in the UI, allowing selection of 5 priority levels.
+* Styled sliders and labels for improved usability and visual appeal.
+
+### Files Modified:
+- [`index.html`](index.html): Added slider input elements and associated labels to filter controls.
+- [`styles.css`](styles.css): Added CSS rules for styling the sliders and priority labels.
+- [`script.js`](script.js): Implemented JavaScript logic for slider initialization, value handling, and updating filter state based on slider input.
+
+The filter controls now feature interactive sliders for each setting, providing a more intuitive way to select priority levels. The visual styling highlights the active priority level.

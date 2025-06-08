@@ -38,7 +38,7 @@ The main functionality of the interactive table is handled by the `DistroCompara
 
 *   **Data Loading:** The class is responsible for loading the distribution data from the JSON files.
 *   **Score Calculation:** It calculates overall and category-specific scores for each distribution based on the values of the criteria.
-*   **Filtering:** Implements the logic to filter distributions based on the selected criteria priorities (Non-Negotiable, Important, Nice-to-Have) and other potential filters (e.g., search).
+*   **Filtering:** Implements the logic to filter distributions based on the selected criteria priorities. This now includes interactive sliders for each filter setting, allowing users to select from predefined priority levels (e.g., Non-Negotiable, Important, Nice-to-Have).
 *   **Sorting:** Provides methods to sort the filtered distributions based on different criteria or calculated scores.
 *   **Table Rendering:** Dynamically generates the HTML table rows and cells based on the filtered and sorted data, including visual indicators (emojis, color coding) and action buttons.
 *   **Event Handling:** Manages user interactions such as clicking filter checkboxes, column headers for sorting, and action buttons (Eliminate, Details).

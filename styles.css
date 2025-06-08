@@ -12,13 +12,13 @@ body {
 }
 
 /* Table styling */
-.sortable-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    overflow: hidden;
+.distro-table {
+  width: auto; /* Adjust table width when columns are hidden */
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* Main container styling */
@@ -59,13 +59,13 @@ body {
 }
 
 /* Table styling */
-.sortable-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  overflow: hidden;
+.distro-table {
+    width: auto; /* Allow width to adjust based on visible columns */
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .sticky-column {
@@ -245,4 +245,61 @@ body {
 
 .filter-attribute {
   min-height: 30px; /* Ensure individual attributes are visible */
+}
+/* Display current filter value next to control */
+.filter-value-display {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+/* Hidden column */
+.hidden-column {
+  display: none;
+}
+
+/* Slider styles */
+.slider-container {
+  margin: 10px 0;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 0.8rem;
+}
+
+.slider-labels span {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.slider-labels span.active {
+  background-color: #e0e0ff;
+  font-weight: bold;
+}
+
+/* Keep first column always visible when others collapse */
+.distro-table th:first-child,
+.distro-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 5;
+  border-right: 2px solid #dee2e6;
+}
+
+/* Make category headers clickable */
+.category-header {
+  cursor: pointer;
+}
+
+/* Arrow indicator spacing */
+.category-header .arrow {
+  margin-left: 5px;
+  font-size: 0.8em;
 }
