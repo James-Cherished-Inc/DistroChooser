@@ -40,6 +40,10 @@ body {
   gap: 20px;
   align-items: center;
 }
+/* Ensure detailed filters span full width below other controls */
+.filter-controls .detailed-filters {
+    flex: 1 1 100%;
+}
 
 .priority-filters {
   display: flex;

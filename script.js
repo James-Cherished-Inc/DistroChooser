@@ -18,7 +18,7 @@ class DistroComparator {
   // Load the filter template from JSON
   async loadFilterTemplate() {
     try {
-      const response = await fetch('http://localhost:8001/http://localhost:8000/data/template.json5');
+      const response = await fetch('data/template.json5');
       // Assuming json5 is not directly supported by fetch, parse as text and then use JSON.parse
       // In a real application, consider using a JSON5 parser library
       const text = await response.text();
@@ -41,16 +41,24 @@ class DistroComparator {
     console.log('renderFilterControls() called');
 
     const detailedFiltersContainer = document.getElementById('detailed-filters');
-    if (!detailedFiltersContainer) return;
+    console.log('renderFilterControls: detailedFiltersContainer:', detailedFiltersContainer);
+    if (!detailedFiltersContainer) {
+        console.error('renderFilterControls: detailed-filters container NOT FOUND. Aborting filter rendering.');
+        return;
+    }
 
     // Clear existing filter placeholders (except category headers)
-    detailedFiltersContainer.querySelectorAll('.filter-placeholder').forEach(placeholder => {
+    // It's important this doesn't clear the category H3 titles themselves.
+    // The .filter-placeholder divs are siblings to the H3s within .filter-category.
+    detailedFiltersContainer.querySelectorAll('.filter-placeholder').forEach((placeholder, index) => {
+        console.log(`renderFilterControls: Clearing placeholder ${index}:`, placeholder);
         placeholder.innerHTML = '';
     });
 
 
     // Iterate through the template and create filter controls
     for (const attributeName in this.filterTemplate) {
+        console.log(`renderFilterControls: Processing attribute from template: ${attributeName}`);
         // Skip attributes that are not meant to be filters or are additional features
         if (["name", "description", "website", "based_on"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
             continue;
@@ -116,10 +124,13 @@ class DistroComparator {
 
 
         const categoryPlaceholder = document.getElementById(categoryPlaceholderId);
+        console.log(`renderFilterControls: Attempting to find categoryPlaceholder with ID: ${categoryPlaceholderId}`, categoryPlaceholder);
+
         if (!categoryPlaceholder) {
-            console.warn(`Category placeholder "${categoryPlaceholderId}" not found.`);
+            console.warn(`Category placeholder "${categoryPlaceholderId}" not found. Skipping attribute: ${attributeName}`);
             continue;
         }
+        console.log(`renderFilterControls: Found categoryPlaceholder "${categoryPlaceholderId}":`, categoryPlaceholder.outerHTML);
 
         const attributeDiv = document.createElement('div');
         attributeDiv.classList.add('filter-attribute');
@@ -183,7 +194,9 @@ class DistroComparator {
       console.log(`renderFilterControls: attributeDiv outerHTML before appending:`, attributeDiv.outerHTML);
         // Append the attributeDiv to the categoryPlaceholder
         categoryPlaceholder.appendChild(attributeDiv);
+        console.log(`renderFilterControls: Appended ${attributeName} to ${categoryPlaceholderId}. Current categoryPlaceholder.innerHTML:`, categoryPlaceholder.innerHTML);
     }
+    console.log('renderFilterControls: Finished processing all attributes.');
 }
 
 
@@ -324,7 +337,7 @@ class DistroComparator {
 
       // Fetch each distro file
       const distroPromises = distroFiles.map(file =>
-        fetch(`http://localhost:8001/http://localhost:8000/data/distros/perplexity-verified/${file}`).then(res => res.json())
+        fetch(`data/distros/perplexity-verified/${file}`).then(res => res.json())
       );
      
      console.log('loadDistrosFromJSON: distroPromises created.');
@@ -404,8 +417,15 @@ class DistroComparator {
     }
 
     // Start with all distros
-    this.filteredDistros = [...this.allDistros];
-    console.log('Initial filteredDistros count:', this.filteredDistros.length);
+    let currentList = [...this.allDistros];
+    console.log('Initial list before elimination filter:', currentList.length);
+
+    // Filter out eliminated distros
+    currentList = currentList.filter(distro => !this.eliminatedDistros.has(distro.name));
+    console.log('List count after elimination filter:', currentList.length);
+    
+    this.filteredDistros = currentList;
+    console.log('Initial filteredDistros count (after elimination):', this.filteredDistros.length);
 
     // Apply filters
     // ... filtering logic ...
@@ -426,24 +446,42 @@ class DistroComparator {
 
   // Sort distributions based on criteria
   sortDistros() {
-    this.filteredDistros.sort((a, b) => {
-      const scoresA = this.calculateScores(a);
-      const scoresB = this.calculateScores(b);
+    const sortBy = this.currentFilters.sortBy;
+    // Predefined scores for specific sort keys that use the calculateScores method
+    const scoreBasedSortKeys = ['overall', 'nonNegotiable', 'important', 'niceToHave'];
 
-      // Handle sorting by individual criteria using the calculated scores
-      const sortBy = this.currentFilters.sortBy;
-      switch (sortBy) {
-        case 'nonNegotiable':
-          return scoresB.nonNegotiable - scoresA.nonNegotiable;
-        case 'important':
-          return scoresB.important - scoresA.important;
-        case 'niceToHave':
-          return scoresB.niceToHave - scoresA.niceToHave;
-        case 'name':
-          return a.name.localeCompare(b.name);
-        default: // overall
-          return scoresB.overall - scoresA.overall;
+    this.filteredDistros.sort((a, b) => {
+      if (scoreBasedSortKeys.includes(sortBy)) {
+        const scoresA = this.calculateScores(a);
+        const scoresB = this.calculateScores(b);
+        // Higher scores first (descending)
+        if (sortBy === 'overall') return scoresB.overall - scoresA.overall;
+        if (sortBy === 'nonNegotiable') return scoresB.nonNegotiable - scoresA.nonNegotiable;
+        if (sortBy === 'important') return scoresB.important - scoresA.important;
+        if (sortBy === 'niceToHave') return scoresB.niceToHave - scoresA.niceToHave;
       }
+
+      // Generic sorting for other keys (actual data properties)
+      const valA = a[sortBy];
+      const valB = b[sortBy];
+
+      // Handle different data types for sorting
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return valA.localeCompare(valB); // Ascending for strings
+      }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return valB - valA; // Descending for numbers
+      }
+      if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+        return (valB === true ? 1 : 0) - (valA === true ? 1 : 0); // True sorts higher (descending)
+      }
+      
+      // Fallback for undefined or mixed types (maintains stable sort or pushes undefined to end)
+      if (valA === undefined && valB !== undefined) return 1; // valA (undefined) comes after valB
+      if (valA !== undefined && valB === undefined) return -1; // valA comes before valB (undefined)
+      if (valA < valB) return -1;
+      if (valA > valB) return 1;
+      return 0;
     });
   }
 
@@ -463,29 +501,91 @@ class DistroComparator {
     table.className = 'distro-table';
 
     // Get the keys from the first distro object to create the header
-    const headers = Object.keys(this.allDistros[0] || {});
+    const rawHeaders = Object.keys(this.allDistros[0] || {});
+    console.log('renderTable: rawHeaders from allDistros[0]:', rawHeaders);
+    if (rawHeaders.length === 0) {
+        console.error('renderTable: No headers found from allDistros[0]. Cannot render table headers.');
+    }
 
-    // Create table header
-    const headerRow = table.insertRow(0);
-    headers.forEach(headerText => {
-      const headerCell = document.createElement('th');
-      headerCell.textContent = headerText;
-      headerRow.appendChild(headerCell);
+    const tableHead = table.createTHead();
+    const headerRow = tableHead.insertRow(0);
+
+    // Add "Actions" header FIRST
+    const actionsHeaderCell = document.createElement('th');
+    actionsHeaderCell.textContent = 'Actions';
+    headerRow.appendChild(actionsHeaderCell); // Appending it first to the empty row
+    console.log('renderTable: Appended "Actions" header first. Full tableHead.outerHTML:', tableHead.outerHTML);
+
+
+    rawHeaders.forEach(headerText => {
+        const headerCell = document.createElement('th');
+        // Simple formatting: replace underscores with spaces and capitalize words
+        const formattedText = headerText.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+        headerCell.textContent = formattedText;
+        headerCell.dataset.sortKey = headerText; // Store raw key for sorting
+        headerCell.style.cursor = 'pointer';
+        // Add a class for potential styling of sortable headers
+        headerCell.classList.add('sortable-header');
+        // Add up/down arrows for sorting indication (initially hidden or neutral)
+        const sortIndicator = document.createElement('span');
+        sortIndicator.classList.add('sort-indicator');
+        sortIndicator.innerHTML = ' &#x2195;'; // Up-down arrow
+        headerCell.appendChild(sortIndicator);
+
+        headerCell.addEventListener('click', () => {
+            const oldSortBy = this.currentFilters.sortBy;
+            this.currentFilters.sortBy = headerText;
+            // Basic toggle for sort direction (can be expanded)
+            // For simplicity, this example doesn't store sort direction per column
+            // It just re-sorts. A more complex system would track asc/desc.
+            this.sortDistros();
+            this.renderTable(); // Re-render with sorted data
+        });
+        headerRow.appendChild(headerCell);
+        console.log(`renderTable: Created header cell for "${headerText}":`, headerCell.outerHTML);
     });
+    console.log('renderTable: Appended "Actions" header. Full tableHead.outerHTML:', tableHead.outerHTML);
 
+    const tableBody = table.createTBody();
     // Create table rows
     this.filteredDistros.forEach(distro => {
-      this.createDistroRow(table, distro, headers);
+      // Pass tableBody, distro, and the rawHeaders (keys for data cells)
+      this.createDistroRow(tableBody, distro, rawHeaders);
     });
 
     tableContainer.appendChild(table);
+    console.log('renderTable: Table fully constructed and appended to container.');
   }
 
-  createDistroRow(table, distro, headers) {
-    const row = table.insertRow();
-    headers.forEach(header => {
-      const cell = row.insertCell();
-      cell.textContent = distro[header] || '';
+  createDistroRow(tableBody, distro, dataHeaders) {
+    const row = tableBody.insertRow();
+
+    // Add Actions cell FIRST
+    const actionsCell = row.insertCell(0); // Insert at index 0
+
+    const detailsButton = document.createElement('button');
+    detailsButton.textContent = 'Details';
+    detailsButton.className = 'details-btn'; // For styling
+    detailsButton.addEventListener('click', () => this.showDetails(distro.name));
+    actionsCell.appendChild(detailsButton);
+
+    const eliminateButton = document.createElement('button');
+    eliminateButton.textContent = 'Eliminate';
+    eliminateButton.className = 'eliminate-btn'; // For styling
+    eliminateButton.addEventListener('click', () => this.eliminateDistro(distro.name));
+    actionsCell.appendChild(eliminateButton);
+
+    // Add data cells after the Actions cell
+    dataHeaders.forEach(headerKey => {
+      const cell = row.insertCell(); // Appends after the actions cell
+      const value = distro[headerKey];
+      if (Array.isArray(value)) {
+        cell.textContent = value.join(', ');
+      } else if (typeof value === 'boolean') {
+        cell.textContent = value ? 'Yes' : 'No';
+      } else {
+        cell.textContent = (value !== undefined && value !== null) ? String(value) : '';
+      }
     });
   }
 
@@ -516,6 +616,7 @@ class DistroComparator {
 
   // Eliminate distribution from comparison
   eliminateDistro(distroName) {
+    console.log(`eliminateDistro: Called for ${distroName}`); // ADD THIS LINE
     this.eliminatedDistros.add(distroName);
     this.filterDistros();
     this.showNotification(`${distroName} eliminated from comparison`);
@@ -523,162 +624,118 @@ class DistroComparator {
 
   // Show detailed information modal
   showDetails(distroName) {
+    console.log(`showDetails: Called with distroName: "${distroName}"`);
     const distro = this.allDistros.find(d => d.name === distroName);
-    if (!distro) return;
+    console.log('showDetails: Found distro object:', distro);
+
+    if (!distro) {
+      console.error(`showDetails: Distro "${distroName}" not found in allDistros.`);
+      this.showNotification(`Error: Could not find details for ${distroName}.`);
+      return;
+    }
 
     const modal = document.getElementById('detailsModal');
     const content = document.getElementById('modalContent');
+    console.log('showDetails: Modal element retrieved:', modal);
+    console.log('showDetails: Content element retrieved:', content);
 
-    // Need to update this to render all attributes dynamically based on the template
-    content.innerHTML = `
-      <h2>${distro.name}</h2>
-      <div class="distro-details-content">
-        <h3>General Info</h3>
-        <p><strong>Description:</strong> ${distro.description}</p>
-        <p><strong>Website:</strong> <a href="${distro.website}" target="_blank">${distro.website}</a></p>
-        <p><strong>Based On:</strong> ${distro.based_on}</p>
+    if (!modal || !content) {
+        console.error('showDetails: Modal or modal content element not found in DOM. Aborting.');
+        return;
+    }
 
-        <h3>System Requirements</h3>
-        <p><strong>RAM Minimum:</strong> ${distro.ram_requirements_minimum} GB</p>
-        <p><strong>RAM Recommended:</strong> ${distro.ram_requirements_recommended} GB</p>
-        <p><strong>Disk Minimum:</strong> ${distro.disk_requirements_minimum} GB</p>
-        <p><strong>Disk Recommended:</strong> ${distro.disk_requirements_recommended} GB</p>
-        <p><strong>CPU Minimum:</strong> ${distro.cpu_requirements_minimum} GHz</p>
-        <p><strong>CPU Cores Minimum:</strong> ${distro.cpu_cores_minimum}</p>
-        <p><strong>Architecture Support:</strong> ${distro.architecture_support.join(', ')}</p>
+    // Dynamically build content based on distro properties to avoid errors with missing keys
+    // Add an "X" close button, styled inline for now, with purple color
+    let detailsHtml = `<span class="close-button modal-x-close" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; line-height: 1; color: purple;">&times;</span>`;
+    detailsHtml += `<h2>${distro.name || 'N/A'}</h2><div class="distro-details-content">`;
+    console.log('showDetails: Initial detailsHtml with title and X button set.');
 
-        <h3>NON-NEGOTIABLE CRITERIA</h3>
-        <p><strong>Secure Boot:</strong> ${distro.secure_boot}</p>
-        <p><strong>Boot Level Vulnerability:</strong> ${distro.boot_level_vulnerability ? 'Yes' : 'No'}</p>
-        <p><strong>GUI Customization:</strong> ${distro.gui_customization}/10</p>
-        <p><strong>Terminal Reliance:</strong> ${distro.terminal_reliance}/10</p>
-        <p><strong>App Compatibility:</strong> ${distro.app_compatibility}/10</p>
-        <p><strong>NVIDIA Support:</strong> ${distro.nvidia_support ? 'Yes' : 'No'}</p>
-        <p><strong>Telemetry:</strong> ${distro.telemetry ? 'Yes' : 'No'}</p>
-        <p><strong>Stability:</strong> ${distro.stability}/10</p>
-        <p><strong>Updates:</strong> ${distro.updates}/10</p>
-        <p><strong>Responsive:</strong> ${distro.responsive}/10</p>
-        <p><strong>Resource Efficient:</strong> ${distro.resource_efficient}/10</p>
-        <p><strong>Power Efficient:</strong> ${distro.power_efficient}/10</p>
-        <p><strong>Cost:</strong> ${distro.cost}</p>
-        <p><strong>Documentation Quality:</strong> ${distro.documentation_quality}/10</p>
-        <p><strong>Lightweight:</strong> ${distro.lightweight}/10</p>
+    try {
+        // Iterate over all keys from the distro object for simplicity.
+        for (const key in distro) {
+            if (Object.hasOwnProperty.call(distro, key)) {
+                const value = distro[key];
+                const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                let formattedValue = '';
 
-        <h3>IMPORTANT CRITERIA</h3>
-        <p><strong>Free Software Ideology:</strong> ${distro.free_software_ideology}/10</p>
-        <p><strong>Proprietary Software Required:</strong> ${distro.proprietary_software_required ? 'Yes' : 'No'}</p>
-        <p><strong>Sysadmin:</strong> ${distro.sysadmin ? 'Yes' : 'No'}</p>
-        <p><strong>Sysadmin Vulnerability:</strong> ${distro.sysadmin_vulnerability ? 'Yes' : 'No'}</p>
-        <p><strong>Illegal:</strong> ${distro.illegal ? 'Yes' : 'No'}</p>
+                if (Array.isArray(value)) {
+                    formattedValue = value.join(', ');
+                } else if (typeof value === 'boolean') {
+                    formattedValue = value ? 'Yes' : 'No';
+                } else {
+                    formattedValue = (value !== undefined && value !== null) ? String(value) : 'N/A';
+                }
+                detailsHtml += `<p><strong>${formattedKey}:</strong> ${formattedValue}</p>`;
+            }
+        }
+        detailsHtml += `</div><button class="close-button">Close</button>`;
+        console.log('showDetails: Generated detailsHtml. Length:', detailsHtml.length);
+        content.innerHTML = detailsHtml;
+        console.log('showDetails: detailsHtml injected into modalContent.');
 
-        <h3>NICE-TO-HAVE CRITERIA</h3>
-        <p><strong>Security Vulnerability:</strong> ${distro.security_vulnerability ? 'Yes' : 'No'}</p>
-        <p><strong>Active Community:</strong> ${distro.active_community ? 'Yes' : 'No'}</p>
-
-        <h3>DETAILED SPECIFICATIONS</h3>
-        <p><strong>RAM Usage Idle:</strong> ${distro.ram_usage_idle} MB</p>
-        <p><strong>Disk Space Installed:</strong> ${distro.disk_space_installed} GB</p>
-        <p><strong>ISO Size:</strong> ${distro.iso_size} MB</p>
-        <p><strong>Boot Time:</strong> ${distro.boot_time} seconds</p>
-        <p><strong>Package Manager:</strong> ${distro.package_manager}</p>
-        <p><strong>Desktop Environments:</strong> ${distro.desktop_environments.join(', ')}</p>
-        <p><strong>Default Desktop:</strong> ${distro.default_desktop}</p>
-        <p><strong>Init System:</strong> ${distro.init_system}</p>
-        <p><strong>Kernel:</strong> ${distro.kernel}</p>
-        <p><strong>Release Model:</strong> ${distro.release_model}</p>
-        <p><strong>Release Cycle (Months):</strong> ${distro.release_cycle_months}</p>
-        <p><strong>Support Duration (Years):</strong> ${distro.support_duration_years}</p>
-        <p><strong>Update Frequency:</strong> ${distro.update_frequency}</p>
-
-        <h3>SECURITY & PRIVACY</h3>
-        <p><strong>Privacy Rating:</strong> ${distro.privacy_rating}/10</p>
-        <p><strong>Security Rating:</strong> ${distro.security_rating}/10</p>
-        <p><strong>Firewall Default:</strong> ${distro.firewall_default ? 'Yes' : 'No'}</p>
-        <p><strong>Firewall:</strong> ${distro.firewall ? 'Yes' : 'No'}</p>
-        <p><strong>Encryption Support:</strong> ${distro.encryption_support ? 'Yes' : 'No'}</p>
-        <p><strong>SELinux/AppArmor:</strong> ${distro.selinux_apparmor ? 'Yes' : 'No'}</p>
-        <p><strong>Automatic Updates:</strong> ${distro.automatic_updates}</p>
-
-        <h3>HARDWARE COMPATIBILITY</h3>
-        <p><strong>WiFi:</strong> ${distro.wifi ? 'Yes' : 'No'}</p>
-        <p><strong>Bluetooth:</strong> ${distro.bluetooth ? 'Yes' : 'No'}</p>
-        <p><strong>Touchscreen:</strong> ${distro.touchscreen ? 'Yes' : 'No'}</p>
-        <p><strong>HiDPI:</strong> ${distro.hidpi ? 'Yes' : 'No'}</p>
-        <p><strong>ARM Support:</strong> ${distro.arm_ ? 'Yes' : 'No'}</p>
-        <p><strong>Raspberry Pi Support:</strong> ${distro.raspberry ? 'Yes' : 'No'}</p>
-
-        <h3>PERFORMANCE METRICS</h3>
-        <p><strong>CPU Usage Idle:</strong> ${distro.cpu_usage_idle}%</p>
-        <p><strong>Disk I/O Performance:</strong> ${distro.disk_io_performance}/10</p>
-        <p><strong>Network Performance:</strong> ${distro.network_performance}/10</p>
-        <p><strong>Gaming Performance:</strong> ${distro.gaming_performance}/10</p>
-
-        <h3>USABILITY</h3>
-        <p><strong>Beginner Friendliness:</strong> ${distro.beginner_friendliness}/10</p>
-        <p><strong>Installer Difficulty:</strong> ${distro.installer_difficulty}/10</p>
-        <p><strong>Post Install Setup:</strong> ${distro.post_install_setup}/10</p>
-        <p><strong>GUI Tools Availability:</strong> ${distro.gui_tools_availability}/10</p>
-        <p><strong>Software Center Quality:</strong> ${distro.software_center_quality}/10</p>
-
-        <h3>DEVELOPMENT & PROFESSIONAL USE</h3>
-        <p><strong>Development Tools:</strong> ${distro.development_tools}/10</p>
-        <p><strong>Programming Languages Included:</strong> ${distro.programming_languages_included.join(', ')}</p>
-        <p><strong>Container Support:</strong> ${distro.container_support}/10</p>
-        <p><strong>Virtualization Support:</strong> ${distro.virtualization_support}/10</p>
-        <p><strong>Server Suitability:</strong> ${distro.server_suitability}/10</p>
-        <p><strong>Enterprise Features:</strong> ${distro.enterprise_features}/10</p>
-
-        <h3>MULTIMEDIA & CREATIVITY</h3>
-        <p><strong>Multimedia Codecs:</strong> ${distro.multimedia_codecs}/10</p>
-        <p><strong>Audio Quality:</strong> ${distro.audio_quality}/10</p>
-        <p><strong>Video Editing Support:</strong> ${distro.video_editing_support}/10</p>
-        <p><strong>Graphics Design Tools:</strong> ${distro.graphics_design_tools}/10</p>
-
-        <h3>ACCESSIBILITY</h3>
-        <p><strong>Screen Reader Support:</strong> ${distro.screen_reader_support}/10</p>
-        <p><strong>Keyboard Navigation:</strong> ${distro.keyboard_navigation}/10</p>
-        <p><strong>High Contrast Themes:</strong> ${distro.high_contrast_themes ? 'Yes' : 'No'}</p>
-        <p><strong>Font Scaling:</strong> ${distro.font_scaling ? 'Yes' : 'No'}</p>
-
-        <h3>LOCALIZATION</h3>
-        <p><strong>Languages Supported:</strong> ${distro.languages_supported}</p>
-        <p><strong>RTL Language Support:</strong> ${distro.rtl_language_support ? 'Yes' : 'No'}</p>
-        <p><strong>Regional Variants:</strong> ${distro.regional_variants.join(', ')}</p>
-
-        <h3>COMMUNITY & ECOSYSTEM</h3>
-        <p><strong>Forum Activity:</strong> ${distro.forum_activity}/10</p>
-        <p><strong>GitHub Activity:</strong> ${distro.github_activity}/10</p>
-        <p><strong>Commercial Support:</strong> ${distro.commercial_support ? 'Yes' : 'No'}</p>
-        <p><strong>Third Party Repositories:</strong> ${distro.third_party_repositories}/10</p>
-        <p><strong>Flatpak Support:</strong> ${distro.flatpak_support ? 'Yes' : 'No'}</p>
-        <p><strong>Snap Support:</strong> ${distro.snap_support ? 'Yes' : 'No'}</p>
-        <p><strong>AppImage Support:</strong> ${distro.appimage_support ? 'Yes' : 'No'}</p>
-
-        <h3>SPECIAL FEATURES</h3>
-        <p><strong>Live USB Support:</strong> ${distro.live_usb_support ? 'Yes' : 'No'}</p>
-        <p><strong>Persistence Support:</strong> ${distro.persistence_support ? 'Yes' : 'No'}</p>
-        <p><strong>Snapshot Rollback:</strong> ${distro.snapshot_rollback ? 'Yes' : 'No'}</p>
-        <p><strong>Immutable System:</strong> ${distro.immutable_system ? 'Yes' : 'No'}</p>
-        <p><strong>Unique Features:</strong> ${distro.unique_features.join(', ')}</p>
-        <p><strong>Target Audience:</strong> ${distro.target_audience.join(', ')}</p>
-
-        <h3>MAINTENANCE</h3>
-        <p><strong>Manual Intervention Frequency:</strong> ${distro.manual_intervention_frequency}/10</p>
-        <p><strong>Breaking Changes Frequency:</strong> ${distro.breaking_changes_frequency}/10</p>
-        <p><strong>Long Term Stability:</strong> ${distro.long_term_stability}/10</p>
-        <p><strong>Backup Tools Included:</strong> ${distro.backup_tools_included}/10</p>
-      </div>
-      <button class="close-button">Close</button>
-    `;
+    } catch (error) {
+        console.error('showDetails: Error constructing details HTML:', error);
+        content.innerHTML = `<p>Error displaying details for ${distro.name || 'Unknown Distro'}.</p><button class="close-button">Close</button>`;
+    }
 
     modal.style.display = 'block';
+    // Attempt to override other CSS properties that might hide the modal
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+    modal.style.position = 'fixed'; // Or 'absolute' depending on desired behavior
+    modal.style.left = '50%';
+    modal.style.top = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.zIndex = '10000'; // A very high z-index
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Semi-transparent background
 
-    // Close modal when clicking outside or on close button
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal || event.target.classList.contains('close-button')) {
-        modal.style.display = 'none';
-      }
-    });
+    // Adjust modal size
+    modal.style.width = '80%';
+    modal.style.maxWidth = '700px';
+    modal.style.maxHeight = '80vh';
+    // Ensure modalContent is scrollable and has some padding for the X button
+    content.style.backgroundColor = 'lightgreen'; // Green background for modal content
+    content.style.color = 'purple'; // Purple text for modal content
+    content.style.padding = '20px'; // General padding
+    content.style.paddingTop = '40px'; // Extra padding at the top for the X button
+    content.style.borderRadius = '8px'; // Rounded corners for a modern feel
+    content.style.maxHeight = 'calc(80vh - 40px)'; // Adjust based on padding/borders of modal-content
+    content.style.overflowY = 'auto';
+    
+
+    console.log('showDetails: Modal display style set to "block" and other styles applied. Modal should be visible.');
+    console.log('showDetails: Modal computed style display:', window.getComputedStyle(modal).display);
+    console.log('showDetails: Modal computed style visibility:', window.getComputedStyle(modal).visibility);
+    console.log('showDetails: Modal computed style opacity:', window.getComputedStyle(modal).opacity);
+
+
+    // Close modal when clicking outside or on close button.
+    // Using .onclick to ensure only one handler is attached, overwriting previous if any.
+    modal.onclick = (event) => {
+        console.log('showDetails: Modal onclick handler triggered. Event target:', event.target);
+        if (event.target === modal || event.target.classList.contains('close-button')) {
+            console.log('showDetails: Closing modal via onclick.');
+            modal.style.display = 'none';
+        }
+    };
+    console.log('showDetails: Modal onclick handler set.');
+  }
+
+  // Show a simple notification (can be enhanced later)
+  showNotification(message) {
+    console.log(`Notification: ${message}`);
+    // For a more user-friendly notification, you might want to create a temporary element on the page
+    // or use a library. For now, a console log will suffice for debugging.
+    // Example of a simple on-page notification:
+    /*
+    const notificationElement = document.createElement('div');
+    notificationElement.className = 'notification';
+    notificationElement.textContent = message;
+    document.body.appendChild(notificationElement);
+    setTimeout(() => {
+      notificationElement.remove();
+    }, 3000);
+    */
   }
 
   // Update statistics display
@@ -694,7 +751,13 @@ class DistroComparator {
 document.addEventListener('DOMContentLoaded', () => {
   const app = new DistroComparator();
   Promise.all([app.loadFilterTemplate(), app.loadDistrosFromJSON()]).then(() => {
-    app.renderFilterControls();
+    // Defer filter rendering slightly to ensure DOM is fully ready for manipulation
+    setTimeout(() => {
+        console.log('DOMContentLoaded: setTimeout callback: Calling renderFilterControls()');
+        app.renderFilterControls();
+    }, 0);
+    // filterDistros also calls renderTable, which should be fine as it targets a different part of the DOM
+    // and also happens after the Promise.all.
     app.filterDistros();
   });
 });
