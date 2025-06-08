@@ -31,7 +31,11 @@
             <div id="stats"></div> <!-- Placeholder for statistics -->
 
             <div class="detailed-filters" id="detailed-filters">
-                <h2>Detailed Filters</h2>
+                <div class="filters-header">
+                    <h2>Detailed Filters</h2>
+                    <button id="toggleFiltersBtn" class="toggle-btn">▼</button>
+                </div>
+                <div id="filters-content">
 
                 <div class="filter-category">
                     <h3>General Info</h3>
@@ -133,6 +137,7 @@
                     <h3>MAINTENANCE</h3>
                     <div class="filter-placeholder" id="maintenance-filters">
                     </div>
+                    </div> <!-- end filters-content -->
                 </div>
             </div>
         </div>

@@ -252,35 +252,79 @@ body {
   font-size: 12px;
   font-weight: 500;
 }
+/* Collapsible detailed filters */
+#detailed-filters .filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+#detailed-filters .filters-header h2 {
+    margin: 0;
+}
+
+#detailed-filters .filters-header .toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+#filters-content {
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+}
+
+#filters-content.collapsed {
+    max-height: 0;
+    display: none;
+}
+
 /* Hidden column */
 .hidden-column {
-  display: none;
+    display: none;
 }
 
-/* Slider styles */
-.slider-container {
-  margin: 10px 0;
-}
-
-.slider-labels {
+/* Priority button styles */
+.priority-buttons-container {
   display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-  font-size: 0.8rem;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.slider-labels span {
+.priority-button {
   flex: 1;
-  text-align: center;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  color: #555;
+  font-size: 0.8rem;
+  font-weight: 500;
   cursor: pointer;
-  padding: 2px 5px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.slider-labels span.active {
+.priority-button:hover {
   background-color: #e0e0ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.priority-button.active {
+  background-color: #d6e4ff;
+  color: #3a6bc8;
   font-weight: bold;
+  box-shadow: 0 0 0 2px #3a6bc8 inset;
 }
 
 /* Keep first column always visible when others collapse */

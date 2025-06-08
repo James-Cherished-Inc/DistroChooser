@@ -149,41 +149,30 @@ class DistroComparator {
         attributeDiv.appendChild(label);
 
         // Create preference level slider with labels
-        const sliderContainer = document.createElement('div');
-        sliderContainer.classList.add('slider-container');
-        
-        const preferenceSlider = document.createElement('input');
-        preferenceSlider.setAttribute('type', 'range');
-        preferenceSlider.setAttribute('id', `${attributeName}-pref`);
-        preferenceSlider.classList.add('preference-level-slider');
-        preferenceSlider.setAttribute('min', '0');
-        preferenceSlider.setAttribute('max', '4');
-        preferenceSlider.setAttribute('value', '1'); // Default to "Don't care"
-        preferenceSlider.setAttribute('step', '1');
-        sliderContainer.appendChild(preferenceSlider);
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'priority-buttons-container';
 
-        // Create labels for slider values
-        const sliderLabels = document.createElement('div');
-        sliderLabels.classList.add('slider-labels');
         const priorityLabels = ['Not important', 'Don\'t care', 'Nice to have', 'Important', 'Non-negotiable'];
         priorityLabels.forEach((label, index) => {
-            const span = document.createElement('span');
-            span.textContent = label;
-            span.dataset.value = index;
-            sliderLabels.appendChild(span);
+            const button = document.createElement('button');
+            button.textContent = label;
+            button.dataset.value = index;
+            button.classList.add('priority-button');
+            if (index === 1) { // Default to "Don't care"
+                button.classList.add('active');
+            }
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons in this container
+                buttonContainer.querySelectorAll('.priority-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                this.filterDistros();
+            });
+            buttonContainer.appendChild(button);
         });
-        sliderContainer.appendChild(sliderLabels);
-        attributeDiv.appendChild(sliderContainer);
 
-        // Highlight current selection
-        this.updateSliderLabel(sliderLabels, 1);
-
-        // Update labels when slider changes
-        preferenceSlider.addEventListener('input', () => {
-            const value = parseInt(preferenceSlider.value);
-            this.updateSliderLabel(sliderLabels, value);
-            this.filterDistros();
-        });
+        attributeDiv.appendChild(buttonContainer);
 
         // Create placeholder for value control
         const valueControlContainer = document.createElement('div');
@@ -212,10 +201,6 @@ class DistroComparator {
             this.populateSelectOptions(attributeName);
         }
 
-        // Add event listeners to the dynamically created controls
-        preferenceSlider.addEventListener('input', () => {
-            this.filterDistros();
-        });
 
         // Event listener for the value control element
         if (valueControlElement) { // Check if an element was actually created
@@ -904,4 +889,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // and also happens after the Promise.all.
     app.filterDistros();
   });
+
+  // Add collapsible functionality to Detailed Filters section
+  const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+  const filtersContent = document.getElementById('filters-content');
+  
+  if (toggleFiltersBtn && filtersContent) {
+    toggleFiltersBtn.addEventListener('click', () => {
+      filtersContent.classList.toggle('collapsed');
+      toggleFiltersBtn.textContent = filtersContent.classList.contains('collapsed') ? '►' : '▼';
+    });
+    
+    // Start with filters expanded
+    filtersContent.classList.remove('collapsed');
+    toggleFiltersBtn.textContent = '▼';
+  }
 });
