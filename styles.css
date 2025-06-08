@@ -1,0 +1,244 @@
+/* Core styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f7fa;
+}
+
+.distro-comparison-container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Table styling */
+.sortable-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Main container styling */
+.distro-comparison-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Filter controls */
+.filter-controls {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.priority-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.priority-filters label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+/* Table styling */
+.sortable-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sticky-column {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 10;
+  border-right: 2px solid #dee2e6;
+}
+
+.category-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 8px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.category-header.non-negotiable {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+.category-header.important {
+  background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+}
+
+.category-header.nice-to-have {
+  background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
+}
+
+.sub-headers th {
+  background: #f8f9fa;
+  padding: 12px 8px;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sub-headers th:hover {
+  background: #e9ecef;
+}
+
+/* Row styling based on scores */
+.distro-row.excellent {
+  background: linear-gradient(90deg, rgba(40, 167, 69, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.distro-row.good {
+  background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.distro-row.fair {
+  background: linear-gradient(90deg, rgba(255, 133, 27, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.distro-row.poor {
+  background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+/* Cell styling */
+.criterion-cell {
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.criterion-cell.success {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+
+.criterion-cell.failure {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.criterion-cell.excellent {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.15);
+}
+
+.criterion-cell.good {
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.15);
+}
+
+.criterion-cell.fair {
+  color: #fd7e14;
+  background: rgba(253, 126, 20, 0.15);
+}
+
+.criterion-cell.poor {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.15);
+}
+
+/* Distro info styling */
+.distro-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.distro-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.overall-score {
+  font-size: 11px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+/* Action buttons */
+.eliminate-btn, .details-btn {
+  padding: 6px 12px;
+  margin: 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.eliminate-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.eliminate-btn:hover {
+  background: #c82333;
+}
+
+.details-btn {
+  background: #007bff;
+  color: white;
+}
+
+.details-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .sortable-table {
+    font-size: 12px;
+  }
+  
+  .criterion-cell {
+    padding: 8px 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .sortable-table {
+    font-size: 11px;
+  }
+}
+
+/* Ensure filter controls are visible */
+.filter-placeholder {
+  min-height: 50px; /* Ensure it's visible */
+}
+
+.filter-attribute {
+  min-height: 30px; /* Ensure individual attributes are visible */
+}

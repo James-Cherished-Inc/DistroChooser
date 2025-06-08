@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Distribution Comparison Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="distro-comparison-container">
+        <div class="filter-controls">
+            <div class="priority-filters">
+                <label>
+                    <input type="checkbox" id="filterNonNegotiable" checked>
+                    Show only distributions meeting NON-NEGOTIABLE criteria
+                </label>
+                <label>
+                    <input type="checkbox" id="filterImportant">
+                    + Must meet IMPORTANT criteria
+                </label>
+                <label>
+                    <input type="checkbox" id="filterNiceToHave">
+                    + Must meet NICE-TO-HAVE criteria
+                </label>
+            </div>
+            <div class="state-controls">
+                <button id="exportStateBtn">Export State</button>
+                <input type="file" id="importStateInput" accept=".json" style="display: none;">
+                <button id="importStateBtn">Import State</button>
+            </div>
+            <div id="stats"></div> <!-- Placeholder for statistics -->
+
+            <div class="detailed-filters">
+                <h2>Detailed Filters</h2>
+
+                <div class="filter-category">
+                    <h3>General Info</h3>
+                    <div class="filter-placeholder" id="general-info-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>SYSTEM REQUIREMENTS</h3>
+                    <div class="filter-placeholder" id="system-requirements-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>NON-NEGOTIABLE CRITERIA</h3>
+                    <div class="filter-placeholder" id="non-negotiable-criteria-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>IMPORTANT CRITERIA</h3>
+                    <div class="filter-placeholder" id="important-criteria-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>NICE-TO-HAVE CRITERIA</h3>
+                    <div class="filter-placeholder" id="nice-to-have-criteria-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>DETAILED SPECIFICATIONS</h3>
+                    <div class="filter-placeholder" id="detailed-specifications-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>SECURITY & PRIVACY</h3>
+                    <div class="filter-placeholder" id="security-privacy-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>HARDWARE COMPATIBILITY</h3>
+                    <div class="filter-placeholder" id="hardware-compatibility-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>PERFORMANCE METRICS</h3>
+                    <div class="filter-placeholder" id="performance-metrics-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>USABILITY</h3>
+                    <div class="filter-placeholder" id="usability-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>DEVELOPMENT & PROFESSIONAL USE</h3>
+                    <div class="filter-placeholder" id="development-professional-use-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>MULTIMEDIA & CREATIVITY</h3>
+                    <div class="filter-placeholder" id="multimedia-creativity-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>ACCESSIBILITY</h3>
+                    <div class="filter-placeholder" id="accessibility-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>LOCALIZATION</h3>
+                    <div class="filter-placeholder" id="localization-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>COMMUNITY & ECOSYSTEM</h3>
+                    <div class="filter-placeholder" id="community-ecosystem-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>SPECIAL FEATURES</h3>
+                    <div class="filter-placeholder" id="special-features-filters">
+                    </div>
+                </div>
+
+                <div class="filter-category">
+                    <h3>MAINTENANCE</h3>
+                    <div class="filter-placeholder" id="maintenance-filters">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+      <section id="filters">
+        <h2>Filters</h2>
+        <div id="filter-controls">
+          <!-- Filter controls will be dynamically added here -->
+        </div>
+      </section>
+
+      <section id="distributions">
+        <h2>Distributions</h2>
+        <div id="table-container">
+          <table class="distro-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Website</th>
+              </tr>
+            </thead>
+            <tbody id="distroTableBody">
+              <!-- Table rows will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+        <p>Displaying <span id="filtered-count">0</span> of <span id="total-count">0</span> distributions</p>
+      </section>
+    </main>
+
+    <!-- Distro details modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/json5@2.2.3/dist/index.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

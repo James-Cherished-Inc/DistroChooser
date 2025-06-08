@@ -1,0 +1,164 @@
+{
+  "name": "Distribution Name", // String: Official distribution name
+  // Info
+  "description": "Brief description", // String: Short description of the distribution
+  "website": "https://example.com", // String: Official website URL
+  "based_on": "Parent Distribution", // String: Base distribution (e.g., "Debian", "Arch", "Independent")
+  
+  // SYSTEM REQUIREMENTS
+  "ram_requirements_minimum": 2, // Number: Minimum RAM in GB
+  "ram_requirements_recommended": 4, // Number: Recommended RAM in GB
+  "disk_requirements_minimum": 20, // Number: Minimum disk space in GB
+  "disk_requirements_recommended": 100, // Number: Recommended disk space in GB
+  "cpu_requirements_minimum": 1.0, // Number: Minimum CPU speed in GHz
+  "cpu_cores_minimum": 1, // Number: Minimum CPU cores required
+  "architecture_support": ["x86_64", "i386"], // Array: Supported architectures
+  
+  // NON-NEGOTIABLE CRITERIA
+  "secure_boot": "yes", // "yes", "no", "manual" - yes: comes signed, no: requires disabling, manual: requires user signing
+  "boot_level_vulnerability": false, // Boolean: true if has known boot-level vulnerabilities
+  "gui_customization": 8, // 1-10 scale: 1=terminal only, 10=extensive GUI customization tools
+  "terminal_reliance": 3, // 1-10 scale: 1=no terminal needed, 10=heavy terminal usage required
+  "app_compatibility": 9, // 1-10 scale: 1=very limited software, 10=excellent app ecosystem
+  "nvidia_support": true, // Boolean: true if NVIDIA drivers work out-of-box or easily installable
+  "telemetry": false, // true if collects telemetry/analytics data, minimal if it's minimal
+  "stability": 10, // 1-10: 10 if the OS stays stable and does not break
+  "updates": 10, // 1-10: 10 if we can implement updates straight away (security, software...), 1 if we have to wait 2-3 years to receive patches and updates and we are lagging behind
+  "responsive": 8, // 1-10 scale: 1=sluggish performance, 10=very responsive
+  "resource_efficient": 7, // 1-10 scale: 1=resource heavy, 10=very lightweight
+  "power_efficient": 7, // 1-10 scale: 1=drains battery fast, 10=excellent power management
+  "cost": "free", // "free", "paid", "donate" 
+  "documentation_quality": 8, // 1-10 scale: 1=poor docs, 10=excellent documentation
+  "lightweight": 7, // 1-10 scale: 1=heavy/bloated, 10=minimal/lightweight
+  
+  // IMPORTANT CRITERIA
+  "free_software_ideology": 7, // 1-10 scale: 1=proprietary focus, 10=strict FSF compliance
+  "proprietary_software_required": false, // Boolean: true if requires proprietary software to function
+  "sysadmin": false, // Boolean: true if it uses sysadmin
+  "sysadmin_vulnerability": false, // Boolean: true if has known sysadmin/privilege escalation vulnerabilities
+  "illegal": true, // true if illegal (Boolean)
+  
+  // NICE-TO-HAVE CRITERIA
+  "security_vulnerability": false, // Boolean: true if has known security vulnerabilities
+  "active_community": true, // Boolean: true if has active development and community support
+  
+  // DETAILED SPECIFICATIONS
+  "ram_usage_idle": 800, // Number: Typical RAM usage when idle in MB
+  "disk_space_installed": 8, // Number: Typical installed size in GB
+  "iso_size": 1800, // Number: ISO download size in MB
+  "boot_time": 45, // Number: Typical boot time in seconds
+  "package_manager": "apt", // String: Primary package manager (apt, dnf, pacman, etc.)
+  "desktop_environments": ["XFCE", "KDE"], // Array: Available desktop environments
+  "default_desktop": "XFCE", // String: Default desktop environment
+  "init_system": "systemd", // String: Init system used (systemd, openrc, runit, etc.)
+  "kernel": "linux", // String: Kernel type (linux, linux-libre, etc.)
+  "release_model": "stable", // "rolling", "stable", "lts", "point" - how updates are delivered
+  "release_cycle_months": 12, // Number: Months between major releases (0 for rolling)
+  "support_duration_years": 3, // Number: Years of support per release
+  "update_frequency": "weekly", // "daily", "weekly", "monthly" - how often updates are released
+  
+  // SECURITY & PRIVACY
+  "privacy_rating": 9, // 1-10 scale: 1=privacy invasive, 10=privacy focused
+  "security_rating": 9, // 1-10 scale: 1=unfixed vulnerabilities, 2=often found vulnerabilities, 5=repeated vulnerabilities found, 10=extremely secure
+  "firewall_default": true, // Boolean: true if firewall is enabled by default
+  "firewall": true, // Boolean: true if firewall is possible
+  "encryption_support": true, // Boolean: true if supports full disk encryption during install
+  "selinux_apparmor": false, // Boolean: true if uses SELinux or AppArmor by default
+  "automatic_updates": "optional", // "enabled", "disabled", "optional" - automatic update behavior
+  
+  // HARDWARE COMPATIBILITY
+  "wifi": false, // Boolean: true if supports
+  "bluetooth": false, // Boolean: true if supports
+  "touchscreen": false, // Boolean: true if supports
+  "hidpi": false, // Boolean: true if supports
+  "arm_": false, // Boolean: true if supports ARM processors
+  "raspberry": false, // Boolean: true if officially supports Raspberry Pi
+  
+  // PERFORMANCE METRICS
+  "cpu_usage_idle": 2, // Number: Typical CPU usage when idle in percentage
+  "disk_io_performance": 7, // 1-10 scale: 1=slow disk I/O, 10=optimized disk performance
+  "network_performance": 8, // 1-10 scale: 1=poor network stack, 10=optimized networking
+  "gaming_performance": 7, // 1-10 scale: 1=poor for gaming, 10=excellent gaming support
+  
+  // USABILITY
+  "beginner_friendliness": 8, // 1-10 scale: 1=expert only, 10=very beginner friendly
+  "installer_difficulty": 2, // 1-10 scale: 1=very easy installer, 10=complex manual installation
+  "post_install_setup": 3, // 1-10 scale: 1=works out of box, 10=requires extensive configuration
+  "gui_tools_availability": 8, // 1-10 scale: 1=mostly terminal tools, 10=comprehensive GUI tools
+  "software_center_quality": 7, // 1-10 scale: 1=poor software management, 10=excellent app store
+  
+  // DEVELOPMENT & PROFESSIONAL USE
+  "development_tools": 8, // 1-10 scale: 1=poor dev environment, 10=excellent for development
+  "programming_languages_included": ["python3", "gcc"], // Array: Programming languages/compilers included
+  "container_support": 8, // 1-10 scale: 1=poor container support, 10=excellent Docker/Podman support
+  "virtualization_support": 7, // 1-10 scale: 1=poor VM support, 10=excellent virtualization
+  "server_suitability": 6, // 1-10 scale: 1=desktop only, 10=excellent for servers
+  "enterprise_features": 4, // 1-10 scale: 1=no enterprise features, 10=full enterprise support
+  
+  // MULTIMEDIA & CREATIVITY
+  "multimedia_codecs": 7, // 1-10 scale: 1=no codecs included, 10=all codecs pre-installed
+  "audio_quality": 8, // 1-10 scale: 1=poor audio support, 10=professional audio ready
+  "video_editing_support": 6, // 1-10 scale: 1=poor video tools, 10=professional video editing ready
+  "graphics_design_tools": 5, // 1-10 scale: 1=basic tools only, 10=professional design suite
+  
+  // ACCESSIBILITY
+  "screen_reader_support": 7, // 1-10 scale: 1=poor accessibility, 10=excellent screen reader support
+  "keyboard_navigation": 8, // 1-10 scale: 1=mouse required, 10=full keyboard navigation
+  "high_contrast_themes": true, // Boolean: true if includes high contrast accessibility themes
+  "font_scaling": true, // Boolean: true if supports easy font size adjustment
+  
+  // LOCALIZATION
+  "languages_supported": 50, // Number: Number of languages supported in UI
+  "rtl_language_support": true, // Boolean: true if supports right-to-left languages properly
+  "regional_variants": ["global"], // Array: Regional variants available (global, china, etc.)
+  
+  // COMMUNITY & ECOSYSTEM
+  "forum_activity": 8, // 1-10 scale: 1=dead forums, 10=very active community forums
+  "github_activity": 7, // 1-10 scale: 1=inactive development, 10=very active GitHub repos
+  "commercial_support": false, // Boolean: true if paid commercial support is available
+  "third_party_repositories": 9, // 1-10 scale: 1=very limited repos, 10=extensive third-party repos
+  "flatpak_support": true, // Boolean: true if Flatpak is supported/included
+  "snap_support": false, // Boolean: true if Snap packages are supported
+  "appimage_support": true, // Boolean: true if AppImage format is supported
+  
+  // SPECIAL FEATURES
+  "live_usb_support": true, // Boolean: true if can run from USB without installation
+  "persistence_support": true, // Boolean: true if live USB supports persistence
+  "snapshot_rollback": false, // Boolean: true if supports system snapshots/rollbacks
+  "immutable_system": false, // Boolean: true if uses immutable/atomic system design
+  "unique_features": ["MX Tools", "Advanced hardware detection"], // Array: Unique selling points
+  "target_audience": ["desktop_users", "intermediate_users"], // Array: Primary target users
+  
+  // MAINTENANCE
+  "manual_intervention_frequency": 2, // 1-10 scale: 1=never needs manual fixes, 10=frequent manual intervention
+  "breaking_changes_frequency": 1, // 1-10 scale: 1=very stable, 10=frequent breaking changes
+  "long_term_stability": 8, // 1-10 scale: 1=unstable over time, 10=rock solid long-term
+  "backup_tools_included": 6, // 1-10 scale: 1=no backup tools, 10=comprehensive backup solutions
+  // ADDITIONAL FEATURES (DO NOT INCLUDE in JSON files for now)
+  "cloud_integration": 5, // 1-10 scale: 1=no cloud features, 10=extensive cloud integration
+  "mobile_device_sync": 3, // 1-10 scale: 1=no mobile sync, 10=seamless mobile integration
+  "ai_features": 2, // 1-10 scale: 1=no AI features, 10=AI-powered tools included
+  "blockchain_support": 1, // 1-10 scale: 1=no blockchain tools, 10=comprehensive crypto/blockchain support
+  "iot_device_support": 4, // 1-10 scale: 1=no IoT support, 10=excellent IoT device management
+  "edge_computing_ready": 3, // 1-10 scale: 1=not suitable for edge, 10=optimized for edge computing
+  "quantum_computing_tools": 1, // 1-10 scale: 1=no quantum tools, 10=quantum development ready
+  "environmental_impact": 7, // 1-10 scale: 1=resource wasteful, 10=environmentally optimized
+  "offline_functionality": 8, // 1-10 scale: 1=requires internet, 10=fully functional offline
+  "cross_platform_compatibility": 6, // 1-10 scale: 1=Linux only, 10=excellent cross-platform file/app compatibility
+  "data_recovery_tools": 5, // 1-10 scale: 1=no recovery tools, 10=professional data recovery suite
+  "forensics_capabilities": 2, // 1-10 scale: 1=no forensics tools, 10=comprehensive digital forensics
+  "penetration_testing": 1, // 1-10 scale: 1=no pentesting tools, 10=comprehensive security testing suite
+  "scientific_computing": 4, // 1-10 scale: 1=basic tools only, 10=comprehensive scientific software
+  "machine_learning_ready": 3, // 1-10 scale: 1=no ML tools, 10=pre-configured ML environment
+  "cryptocurrency_mining": 2, // 1-10 scale: 1=not suitable, 10=optimized for mining
+  "retro_gaming": 5, // 1-10 scale: 1=poor retro support, 10=excellent retro gaming platform
+  "streaming_broadcasting": 4, // 1-10 scale: 1=basic streaming, 10=professional broadcasting ready
+  "3d_printing_support": 3, // 1-10 scale: 1=no 3D printing tools, 10=comprehensive 3D printing suite
+  "cad_engineering": 2, // 1-10 scale: 1=no CAD tools, 10=professional engineering software
+  "medical_software": 1, // 1-10 scale: 1=no medical tools, 10=medical/healthcare software suite
+  "educational_tools": 6, // 1-10 scale: 1=no educational software, 10=comprehensive educational suite
+  "parental_controls": 4, // 1-10 scale: 1=no parental features, 10=comprehensive parental controls
+  "kiosk_mode": 3, // 1-10 scale: 1=no kiosk support, 10=excellent kiosk/public terminal mode
+  "digital_signage": 2, // 1-10 scale: 1=not suitable, 10=optimized for digital signage
+  "embedded_systems": 3 // 1-10 scale: 1=not suitable for embedded, 10=optimized for embedded systems
+}
