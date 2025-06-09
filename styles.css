@@ -1,3 +1,22 @@
+/* Subsection collapsible styles */
+.subsection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5em 0;
+}
+
+.subsection-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.subsection.collapsed .subsection-content {
+    display: none !important;
+}
 /* Core styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,13 +31,13 @@ body {
 }
 
 /* Table styling */
-.sortable-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    overflow: hidden;
+.distro-table {
+  width: auto; /* Adjust table width when columns are hidden */
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* Main container styling */
@@ -36,32 +55,95 @@ body {
   border-radius: 8px;
   margin-bottom: 20px;
   display: flex;
+  flex-direction: row; /* Changed to row */
   flex-wrap: wrap;
   gap: 20px;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.filter-controls > div {
+    margin-bottom: 10px; /* Add spacing between the divs */
+}
+
+/* Active filters display container */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #eef2f7;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.priority-controls-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.state-controls {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 .priority-filters {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
 }
 
 .priority-filters label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+.filter-controls .detailed-filters {
+    flex: 1 1 100%;
+}
+
+.priority-controls-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.state-controls {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.priority-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.priority-filters label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
 }
 
 /* Table styling */
-.sortable-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  overflow: hidden;
+.distro-table {
+    width: auto; /* Allow width to adjust based on visible columns */
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .sticky-column {
@@ -241,4 +323,128 @@ body {
 
 .filter-attribute {
   min-height: 30px; /* Ensure individual attributes are visible */
+}
+/* Display current filter value next to control */
+.filter-value-display {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.detailed-filters .filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+#detailed-filters .filters-header h2 {
+    margin: 0;
+}
+
+#detailed-filters .filters-header .toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+#filters-content {
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+}
+
+#detailed-filters.collapsed #filters-content {
+    display: none !important;
+}
+
+/* Hidden column */
+.hidden-column {
+    display: none;
+}
+
+/* Priority button styles */
+.priority-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.priority-button {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  color: #555;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.priority-button:hover {
+  background-color: #e0e0ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.priority-button.active {
+  background-color: #d6e4ff;
+  color: #3a6bc8;
+  font-weight: bold;
+  box-shadow: 0 0 0 2px #3a6bc8 inset;
+}
+
+/* Keep first column always visible when others collapse */
+.distro-table th:first-child,
+.distro-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 5;
+  border-right: 2px solid #dee2e6;
+}
+
+/* Make category headers clickable */
+.category-header {
+  cursor: pointer;
+}
+
+/* Arrow indicator spacing */
+.category-header .arrow {
+  margin-left: 5px;
+  font-size: 0.8em;
+}
+/* Override Detailed Filters collapse to ensure it hides */
+#filters-content.collapsed {
+    display: none !important;
+}
+/* Active filters display container */
+.active-filters {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #eef2f7;
+    border-radius: 4px;
+}
+/* Filter badge styling */
+.filter-badge {
+  display: inline-block;
+  margin: 4px 8px 4px 0;
+  padding: 4px 10px;
+  background-color: #dfe6e9;
+  color: #2d3436;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+.attribute-badge {
+  background-color: #74b9ff;
+  color: #fff;
 }

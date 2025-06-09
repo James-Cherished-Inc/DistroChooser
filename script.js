@@ -18,16 +18,16 @@ class DistroComparator {
   // Load the filter template from JSON
   async loadFilterTemplate() {
     try {
-      const response = await fetch('http://localhost:8001/http://localhost:8000/data/template.json5');
+      const response = await fetch('data/template.json5');
       // Assuming json5 is not directly supported by fetch, parse as text and then use JSON.parse
       // In a real application, consider using a JSON5 parser library
       const text = await response.text();
       this.filterTemplate = JSON5.parse(text); // Use JSON5.parse for JSON5 format
-      console.log('Filter template loaded:', this.filterTemplate);
-      console.log('loadFilterTemplate() called');
+      
+      
     } catch (error) {
-      console.error('Error loading filter template:', error);
-      console.error('Filter template parsing error:', error); // Log the specific error object
+      
+       // Log the specific error object
       // Optionally display an error message to the user
     }
   }
@@ -35,22 +35,30 @@ class DistroComparator {
   // Dynamically render filter controls based on the loaded template
   renderFilterControls() {
     if (!this.filterTemplate) {
-      console.error('Filter template not loaded.');
+      
       return;
     }
-    console.log('renderFilterControls() called');
+    
 
     const detailedFiltersContainer = document.getElementById('detailed-filters');
-    if (!detailedFiltersContainer) return;
+    
+    if (!detailedFiltersContainer) {
+        
+        return;
+    }
 
     // Clear existing filter placeholders (except category headers)
-    detailedFiltersContainer.querySelectorAll('.filter-placeholder').forEach(placeholder => {
+    // It's important this doesn't clear the category H3 titles themselves.
+    // The .filter-placeholder divs are siblings to the H3s within .filter-category.
+    detailedFiltersContainer.querySelectorAll('.filter-placeholder').forEach((placeholder, index) => {
+        
         placeholder.innerHTML = '';
     });
 
 
     // Iterate through the template and create filter controls
     for (const attributeName in this.filterTemplate) {
+        
         // Skip attributes that are not meant to be filters or are additional features
         if (["name", "description", "website", "based_on"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
             continue;
@@ -60,7 +68,11 @@ class DistroComparator {
         let attributeType;
 
         if (typeof attributeValue === 'number') {
-            attributeType = 'number';
+            if (attributeValue <= 10) {
+                attributeType = 'scale';
+            } else {
+                attributeType = 'number';
+            }
         } else if (typeof attributeValue === 'boolean') {
             attributeType = 'boolean';
         } else if (Array.isArray(attributeValue)) {
@@ -110,16 +122,19 @@ class DistroComparator {
             categoryPlaceholderId = 'maintenance-filters';
         } else {
             // If an attribute doesn't match any known category, skip it for now
-            console.warn(`Attribute "${attributeName}" not mapped to a category.`);
+            
             continue;
         }
 
 
         const categoryPlaceholder = document.getElementById(categoryPlaceholderId);
+        
+
         if (!categoryPlaceholder) {
-            console.warn(`Category placeholder "${categoryPlaceholderId}" not found.`);
+            
             continue;
         }
+        
 
         const attributeDiv = document.createElement('div');
         attributeDiv.classList.add('filter-attribute');
@@ -133,15 +148,31 @@ class DistroComparator {
         label.textContent = `${labelText}:`;
         attributeDiv.appendChild(label);
 
-        // Create preference level slider
-        const preferenceSlider = document.createElement('input');
-        preferenceSlider.setAttribute('type', 'range');
-        preferenceSlider.setAttribute('id', `${attributeName}-pref`);
-        preferenceSlider.classList.add('preference-level-slider');
-        preferenceSlider.setAttribute('min', '0');
-        preferenceSlider.setAttribute('max', '4');
-        preferenceSlider.setAttribute('value', '1'); // Default to "Don't care"
-        attributeDiv.appendChild(preferenceSlider);
+        // Create preference level slider with labels
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'priority-buttons-container';
+
+        const priorityLabels = ['Not important', 'Don\'t care', 'Nice to have', 'Important', 'Non-negotiable'];
+        priorityLabels.forEach((label, index) => {
+            const button = document.createElement('button');
+            button.textContent = label;
+            button.dataset.value = index;
+            button.classList.add('priority-button');
+            if (index === 1) { // Default to "Don't care"
+                button.classList.add('active');
+            }
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons in this container
+                buttonContainer.querySelectorAll('.priority-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                this.filterDistros();
+            });
+            buttonContainer.appendChild(button);
+        });
+
+        attributeDiv.appendChild(buttonContainer);
 
         // Create placeholder for value control
         const valueControlContainer = document.createElement('div');
@@ -149,19 +180,27 @@ class DistroComparator {
         attributeDiv.appendChild(valueControlContainer);
 
         // Render the appropriate value control
-        // Call the new renderValueControl that returns an element
         const valueControlElement = this.renderValueControl(attributeName, attributeType);
-        valueControlContainer.appendChild(valueControlElement); // Append the element directly
+        valueControlContainer.appendChild(valueControlElement);
+
+        // Create span to display the current value
+        const valueDisplay = document.createElement('span');
+        valueDisplay.classList.add('filter-value-display');
+        valueDisplay.textContent = valueControlElement.value;
+        valueControlContainer.appendChild(valueDisplay);
+
+        // Update the displayed value on input for number and scale types
+        if (attributeType === 'number' || attributeType === 'scale') {
+            valueControlElement.addEventListener('input', () => {
+                valueDisplay.textContent = valueControlElement.value;
+            });
+        }
 
         // Populate select options for array/string types after rendering
         if (attributeType === 'array' || attributeType === 'string') {
             this.populateSelectOptions(attributeName);
         }
 
-        // Add event listeners to the dynamically created controls
-        preferenceSlider.addEventListener('input', () => {
-            this.filterDistros();
-        });
 
         // Event listener for the value control element
         if (valueControlElement) { // Check if an element was actually created
@@ -179,11 +218,13 @@ class DistroComparator {
                  });
             }
         }
-      console.log(`renderFilterControls: Processing attribute: ${attributeName}, type: ${attributeType}`);
-      console.log(`renderFilterControls: attributeDiv outerHTML before appending:`, attributeDiv.outerHTML);
+      
+      
         // Append the attributeDiv to the categoryPlaceholder
         categoryPlaceholder.appendChild(attributeDiv);
+        
     }
+    
 }
 
 
@@ -324,17 +365,17 @@ class DistroComparator {
 
       // Fetch each distro file
       const distroPromises = distroFiles.map(file =>
-        fetch(`http://localhost:8001/http://localhost:8000/data/distros/perplexity-verified/${file}`).then(res => res.json())
+        fetch(`data/distros/perplexity-verified/${file}`).then(res => res.json())
       );
      
-     console.log('loadDistrosFromJSON: distroPromises created.');
+     
 
      this.allDistros = await Promise.all(distroPromises);
-     console.log('loadDistrosFromJSON: Promise.all resolved. Data assigned to this.allDistros.');
-     console.log('Distros loaded:', this.allDistros);
-     console.log('loadDistrosFromJSON() called');
+     
+     
+     
    } catch (error) {
-     console.error('Error loading distributions:', error);
+     
       // Optionally display an error message to the user
     }
   }
@@ -361,10 +402,16 @@ class DistroComparator {
       niceToHave: categoryMappings.niceToHave.length * 10
     };
 
-    // Calculate scores for each category
+    // Calculate scores for each category, including boolean handling for non-negotiable
     categoryMappings.nonNegotiable.forEach(prop => {
-      if (distro[prop] !== undefined) {
-        scores.nonNegotiable += typeof distro[prop] === 'number' ? distro[prop] : 0;
+      const value = distro[prop];
+      if (value !== undefined) {
+        if (typeof value === 'number') {
+          scores.nonNegotiable += value;
+        } else if (typeof value === 'boolean') {
+          // Boolean non-negotiable criteria count as full score (10) if true
+          scores.nonNegotiable += value ? 10 : 0;
+        }
       }
     });
 
@@ -395,55 +442,93 @@ class DistroComparator {
 
   // Filter distributions based on criteria
   filterDistros() {
-    console.log('filterDistros() called');
+    
 
     // Ensure allDistros is populated before proceeding
     if (!this.allDistros || this.allDistros.length === 0) {
-      console.log('filterDistros: allDistros is empty, skipping filtering and rendering.');
+      
       return; // Exit the function if data is not ready
     }
 
     // Start with all distros
-    this.filteredDistros = [...this.allDistros];
-    console.log('Initial filteredDistros count:', this.filteredDistros.length);
+    let currentList = [...this.allDistros];
+    
 
-    // Apply filters
-    // ... filtering logic ...
+    // Filter out eliminated distros
+    currentList = currentList.filter(distro => !this.eliminatedDistros.has(distro.name));
+    
+
+    // Apply priority summary filters based on selected checkboxes
+    if (this.currentFilters.nonNegotiable) {
+        currentList = currentList.filter(distro => this.calculateScores(distro).nonNegotiable === 100);
+    }
+    if (this.currentFilters.important) {
+        currentList = currentList.filter(distro => this.calculateScores(distro).important === 100);
+    }
+    if (this.currentFilters.niceToHave) {
+        currentList = currentList.filter(distro => this.calculateScores(distro).niceToHave === 100);
+    }
+
+    // Apply sorting before rendering
+    this.sortDistros();
+    
+    this.filteredDistros = currentList;
+    
+
+    // NOTE: static summary filters applied above; dynamic attribute filters can be added here
 
     // Apply sorting
     // ... sorting logic ...
 
     // Render the table with filtered and sorted data
-    console.log('Calling renderTable()');
+    
     this.renderTable();
-    console.log('renderTable() called');
+    
 
     // Update the displayed count
-    console.log('Calling updateDistroCount()');
+    
     this.updateStats();
-    console.log('updateStats() called');
+    
   }
 
   // Sort distributions based on criteria
   sortDistros() {
-    this.filteredDistros.sort((a, b) => {
-      const scoresA = this.calculateScores(a);
-      const scoresB = this.calculateScores(b);
+    const sortBy = this.currentFilters.sortBy;
+    // Predefined scores for specific sort keys that use the calculateScores method
+    const scoreBasedSortKeys = ['overall', 'nonNegotiable', 'important', 'niceToHave'];
 
-      // Handle sorting by individual criteria using the calculated scores
-      const sortBy = this.currentFilters.sortBy;
-      switch (sortBy) {
-        case 'nonNegotiable':
-          return scoresB.nonNegotiable - scoresA.nonNegotiable;
-        case 'important':
-          return scoresB.important - scoresA.important;
-        case 'niceToHave':
-          return scoresB.niceToHave - scoresA.niceToHave;
-        case 'name':
-          return a.name.localeCompare(b.name);
-        default: // overall
-          return scoresB.overall - scoresA.overall;
+    this.filteredDistros.sort((a, b) => {
+      if (scoreBasedSortKeys.includes(sortBy)) {
+        const scoresA = this.calculateScores(a);
+        const scoresB = this.calculateScores(b);
+        // Higher scores first (descending)
+        if (sortBy === 'overall') return scoresB.overall - scoresA.overall;
+        if (sortBy === 'nonNegotiable') return scoresB.nonNegotiable - scoresA.nonNegotiable;
+        if (sortBy === 'important') return scoresB.important - scoresA.important;
+        if (sortBy === 'niceToHave') return scoresB.niceToHave - scoresA.niceToHave;
       }
+
+      // Generic sorting for other keys (actual data properties)
+      const valA = a[sortBy];
+      const valB = b[sortBy];
+
+      // Handle different data types for sorting
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return valA.localeCompare(valB); // Ascending for strings
+      }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return valB - valA; // Descending for numbers
+      }
+      if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+        return (valB === true ? 1 : 0) - (valA === true ? 1 : 0); // True sorts higher (descending)
+      }
+      
+      // Fallback for undefined or mixed types (maintains stable sort or pushes undefined to end)
+      if (valA === undefined && valB !== undefined) return 1; // valA (undefined) comes after valB
+      if (valA !== undefined && valB === undefined) return -1; // valA comes before valB (undefined)
+      if (valA < valB) return -1;
+      if (valA > valB) return 1;
+      return 0;
     });
   }
 
@@ -451,7 +536,7 @@ class DistroComparator {
   renderTable() {
     const tableContainer = document.getElementById('table-container');
     if (!tableContainer) {
-      console.error('Table container not found');
+      
       return;
     }
 
@@ -462,30 +547,181 @@ class DistroComparator {
     const table = document.createElement('table');
     table.className = 'distro-table';
 
-    // Get the keys from the first distro object to create the header
-    const headers = Object.keys(this.allDistros[0] || {});
+    // Define column groups
+    const columnGroups = [
+      { label: 'Actions', keys: ['actions'] },
+      { label: 'General Info', keys: ['name', 'description', 'website', 'based_on'] },
+      { label: 'System Requirements', keys: ['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'] },
+      { label: 'Non-Negotiable Criteria', keys: ['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_reliance', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'] },
+      { label: 'Important Criteria', keys: ['free_software_ideology', 'proprietary_software_required', 'sysadmin', 'sysadmin_vulnerability', 'illegal'] },
+      { label: 'Nice-To-Have Criteria', keys: ['security_vulnerability', 'active_community'] },
+      { label: 'Detailed Specifications', keys: ['ram_usage_idle', 'disk_space_installed', 'iso_size', 'boot_time', 'package_manager', 'desktop_environments', 'default_desktop', 'init_system', 'kernel', 'release_model', 'release_cycle_months', 'support_duration_years', 'update_frequency'] },
+      { label: 'Security & Privacy', keys: ['privacy_rating', 'security_rating', 'firewall_default', 'firewall', 'encryption_support', 'selinux_apparmor', 'automatic_updates'] },
+      { label: 'Hardware Compatibility', keys: ['wifi', 'bluetooth', 'touchscreen', 'hidpi', 'arm_', 'raspberry'] },
+      { label: 'Performance Metrics', keys: ['cpu_usage_idle', 'disk_io_performance', 'network_performance', 'gaming_performance'] },
+      { label: 'Usability', keys: ['beginner_friendliness', 'installer_difficulty', 'post_install_setup', 'gui_tools_availability', 'software_center_quality'] },
+      { label: 'Development & Professional Use', keys: ['development_tools', 'programming_languages_included', 'container_support', 'virtualization_support', 'server_suitability', 'enterprise_features'] },
+      { label: 'Multimedia & Creativity', keys: ['multimedia_codecs', 'audio_quality', 'video_editing_support', 'graphics_design_tools'] },
+      { label: 'Accessibility', keys: ['screen_reader_support', 'keyboard_navigation', 'high_contrast_themes', 'font_scaling'] },
+      { label: 'Localization', keys: ['languages_supported', 'rtl_language_support', 'regional_variants'] },
+      { label: 'Community & Ecosystem', keys: ['forum_activity', 'github_activity', 'commercial_support', 'third_party_repositories', 'flatpak_support', 'snap_support', 'appimage_support'] },
+      { label: 'Special Features', keys: ['live_usb_support', 'persistence_support', 'snapshot_rollback', 'immutable_system', 'unique_features', 'target_audience'] },
+      { label: 'Maintenance', keys: ['manual_intervention_frequency', 'breaking_changes_frequency', 'long_term_stability', 'backup_tools_included'] }
+    ];
 
-    // Create table header
-    const headerRow = table.insertRow(0);
-    headers.forEach(headerText => {
-      const headerCell = document.createElement('th');
-      headerCell.textContent = headerText;
-      headerRow.appendChild(headerCell);
+    // Create table header with grouped columns
+    const thead = document.createElement('thead');
+
+    // Group header row
+    const groupHeaderRow = document.createElement('tr');
+    columnGroups.forEach((group, groupIndex) => {
+      const th = document.createElement('th');
+      th.colSpan = group.keys.length;
+      th.dataset.originalColspan = group.keys.length; // Store original colspan
+      th.className = 'category-header';
+      th.textContent = group.label;
+      // Store group index for toggling
+      th.dataset.groupIndex = groupIndex;
+      if (groupIndex === 0) {
+        // First column ("Actions") is not collapsible
+        groupHeaderRow.appendChild(th);
+        return;
+      }
+      // Add arrow indicator for collapse/expand
+      const arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.textContent = ' ▼';
+      th.appendChild(arrow);
+      // Click event to toggle columns visibility
+      th.addEventListener('click', () => {
+        const isCollapsed = th.classList.toggle('collapsed');
+        arrow.textContent = isCollapsed ? ' ►' : ' ▼';
+        // Toggle hidden-column class on relevant header and body cells
+        const headerCells = table.querySelectorAll(`thead tr:nth-child(2) th[data-group-index="${groupIndex}"]`);
+        const bodyCells = table.querySelectorAll(`tbody td[data-group-index="${groupIndex}"]`);
+        
+        if (isCollapsed) {
+          // When collapsing, show only first column in group
+          headerCells.forEach((cell, idx) => {
+            cell.classList.toggle('hidden-column', idx !== 0);
+          });
+          bodyCells.forEach((cell, idx) => {
+            // Calculate column index within group (modulo group size)
+            const colIdx = idx % group.keys.length;
+            cell.classList.toggle('hidden-column', colIdx !== 0);
+          });
+          // Adjust group header colspan to match visible column
+          th.colSpan = 1;
+        } else {
+          // When expanding, show all columns
+          headerCells.forEach(cell => cell.classList.remove('hidden-column'));
+          bodyCells.forEach(cell => cell.classList.remove('hidden-column'));
+          // Restore original colspan
+          th.colSpan = parseInt(th.dataset.originalColspan);
+        }
+      });
+      groupHeaderRow.appendChild(th);
     });
+    thead.appendChild(groupHeaderRow);
 
-    // Create table rows
+    // Column header row
+    const headerRow = document.createElement('tr');
+    columnGroups.forEach((group, groupIndex) => {
+      group.keys.forEach(key => {
+        const th = document.createElement('th');
+        // Format header text
+        const formatted = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        th.textContent = formatted;
+        th.dataset.sortKey = key;
+        th.dataset.groupIndex = groupIndex;
+        th.className = 'sortable-header';
+        // Add sort indicator
+        const indicator = document.createElement('span');
+        indicator.className = 'sort-indicator';
+        indicator.innerHTML = ' &#x2195;';
+        th.appendChild(indicator);
+        // Sort event
+        th.addEventListener('click', () => {
+          this.currentFilters.sortBy = key;
+          this.sortDistros();
+          this.renderTable();
+        });
+        headerRow.appendChild(th);
+      });
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Table body
+    const tbody = document.createElement('tbody');
     this.filteredDistros.forEach(distro => {
-      this.createDistroRow(table, distro, headers);
-    });
+      const row = document.createElement('tr');
+      columnGroups.forEach((group, groupIndex) => {
+        group.keys.forEach(key => {
+          const td = document.createElement('td');
+          td.dataset.groupIndex = groupIndex;
+          if (key === 'actions') {
+            const detailsBtn = document.createElement('button');
+            detailsBtn.textContent = 'Details';
+            detailsBtn.className = 'details-btn';
+            detailsBtn.addEventListener('click', () => this.showDetails(distro.name));
+            td.appendChild(detailsBtn);
 
+            const eliminateBtn = document.createElement('button');
+            eliminateBtn.textContent = 'Eliminate';
+            eliminateBtn.className = 'eliminate-btn';
+            eliminateBtn.addEventListener('click', () => this.eliminateDistro(distro.name));
+            td.appendChild(eliminateBtn);
+          } else {
+            const value = distro[key];
+            if (Array.isArray(value)) {
+              td.textContent = value.join(', ');
+            } else if (typeof value === 'boolean') {
+              td.textContent = value ? 'Yes' : 'No';
+            } else {
+              td.textContent = value != null ? String(value) : '';
+            }
+          }
+          row.appendChild(td);
+        });
+      });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+
+    // Append table to container
     tableContainer.appendChild(table);
   }
 
-  createDistroRow(table, distro, headers) {
-    const row = table.insertRow();
-    headers.forEach(header => {
-      const cell = row.insertCell();
-      cell.textContent = distro[header] || '';
+  createDistroRow(tableBody, distro, dataHeaders) {
+    const row = tableBody.insertRow();
+
+    // Add Actions cell FIRST
+    const actionsCell = row.insertCell(0); // Insert at index 0
+
+    const detailsButton = document.createElement('button');
+    detailsButton.textContent = 'Details';
+    detailsButton.className = 'details-btn'; // For styling
+    detailsButton.addEventListener('click', () => this.showDetails(distro.name));
+    actionsCell.appendChild(detailsButton);
+
+    const eliminateButton = document.createElement('button');
+    eliminateButton.textContent = 'Eliminate';
+    eliminateButton.className = 'eliminate-btn'; // For styling
+    eliminateButton.addEventListener('click', () => this.eliminateDistro(distro.name));
+    actionsCell.appendChild(eliminateButton);
+
+    // Add data cells after the Actions cell
+    dataHeaders.forEach(headerKey => {
+      const cell = row.insertCell(); // Appends after the actions cell
+      const value = distro[headerKey];
+      if (Array.isArray(value)) {
+        cell.textContent = value.join(', ');
+      } else if (typeof value === 'boolean') {
+        cell.textContent = value ? 'Yes' : 'No';
+      } else {
+        cell.textContent = (value !== undefined && value !== null) ? String(value) : '';
+      }
     });
   }
 
@@ -516,6 +752,7 @@ class DistroComparator {
 
   // Eliminate distribution from comparison
   eliminateDistro(distroName) {
+     // ADD THIS LINE
     this.eliminatedDistros.add(distroName);
     this.filterDistros();
     this.showNotification(`${distroName} eliminated from comparison`);
@@ -523,170 +760,160 @@ class DistroComparator {
 
   // Show detailed information modal
   showDetails(distroName) {
+    
     const distro = this.allDistros.find(d => d.name === distroName);
-    if (!distro) return;
+    
+
+    if (!distro) {
+      
+      this.showNotification(`Error: Could not find details for ${distroName}.`);
+      return;
+    }
 
     const modal = document.getElementById('detailsModal');
     const content = document.getElementById('modalContent');
+    
+    
 
-    // Need to update this to render all attributes dynamically based on the template
-    content.innerHTML = `
-      <h2>${distro.name}</h2>
-      <div class="distro-details-content">
-        <h3>General Info</h3>
-        <p><strong>Description:</strong> ${distro.description}</p>
-        <p><strong>Website:</strong> <a href="${distro.website}" target="_blank">${distro.website}</a></p>
-        <p><strong>Based On:</strong> ${distro.based_on}</p>
+    if (!modal || !content) {
+        
+        return;
+    }
 
-        <h3>System Requirements</h3>
-        <p><strong>RAM Minimum:</strong> ${distro.ram_requirements_minimum} GB</p>
-        <p><strong>RAM Recommended:</strong> ${distro.ram_requirements_recommended} GB</p>
-        <p><strong>Disk Minimum:</strong> ${distro.disk_requirements_minimum} GB</p>
-        <p><strong>Disk Recommended:</strong> ${distro.disk_requirements_recommended} GB</p>
-        <p><strong>CPU Minimum:</strong> ${distro.cpu_requirements_minimum} GHz</p>
-        <p><strong>CPU Cores Minimum:</strong> ${distro.cpu_cores_minimum}</p>
-        <p><strong>Architecture Support:</strong> ${distro.architecture_support.join(', ')}</p>
+    // Dynamically build content based on distro properties to avoid errors with missing keys
+    // Add an "X" close button, styled inline for now, with purple color
+    let detailsHtml = `<span class="close-button modal-x-close" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; line-height: 1; color: purple;">&times;</span>`;
+    detailsHtml += `<h2>${distro.name || 'N/A'}</h2><div class="distro-details-content">`;
+    
 
-        <h3>NON-NEGOTIABLE CRITERIA</h3>
-        <p><strong>Secure Boot:</strong> ${distro.secure_boot}</p>
-        <p><strong>Boot Level Vulnerability:</strong> ${distro.boot_level_vulnerability ? 'Yes' : 'No'}</p>
-        <p><strong>GUI Customization:</strong> ${distro.gui_customization}/10</p>
-        <p><strong>Terminal Reliance:</strong> ${distro.terminal_reliance}/10</p>
-        <p><strong>App Compatibility:</strong> ${distro.app_compatibility}/10</p>
-        <p><strong>NVIDIA Support:</strong> ${distro.nvidia_support ? 'Yes' : 'No'}</p>
-        <p><strong>Telemetry:</strong> ${distro.telemetry ? 'Yes' : 'No'}</p>
-        <p><strong>Stability:</strong> ${distro.stability}/10</p>
-        <p><strong>Updates:</strong> ${distro.updates}/10</p>
-        <p><strong>Responsive:</strong> ${distro.responsive}/10</p>
-        <p><strong>Resource Efficient:</strong> ${distro.resource_efficient}/10</p>
-        <p><strong>Power Efficient:</strong> ${distro.power_efficient}/10</p>
-        <p><strong>Cost:</strong> ${distro.cost}</p>
-        <p><strong>Documentation Quality:</strong> ${distro.documentation_quality}/10</p>
-        <p><strong>Lightweight:</strong> ${distro.lightweight}/10</p>
+    try {
+        // Iterate over all keys from the distro object for simplicity.
+        for (const key in distro) {
+            if (Object.hasOwnProperty.call(distro, key)) {
+                const value = distro[key];
+                const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                let formattedValue = '';
 
-        <h3>IMPORTANT CRITERIA</h3>
-        <p><strong>Free Software Ideology:</strong> ${distro.free_software_ideology}/10</p>
-        <p><strong>Proprietary Software Required:</strong> ${distro.proprietary_software_required ? 'Yes' : 'No'}</p>
-        <p><strong>Sysadmin:</strong> ${distro.sysadmin ? 'Yes' : 'No'}</p>
-        <p><strong>Sysadmin Vulnerability:</strong> ${distro.sysadmin_vulnerability ? 'Yes' : 'No'}</p>
-        <p><strong>Illegal:</strong> ${distro.illegal ? 'Yes' : 'No'}</p>
+                if (Array.isArray(value)) {
+                    formattedValue = value.join(', ');
+                } else if (typeof value === 'boolean') {
+                    formattedValue = value ? 'Yes' : 'No';
+                } else {
+                    formattedValue = (value !== undefined && value !== null) ? String(value) : 'N/A';
+                }
+                detailsHtml += `<p><strong>${formattedKey}:</strong> ${formattedValue}</p>`;
+            }
+        }
+        detailsHtml += `</div><button class="close-button">Close</button>`;
+        
+        content.innerHTML = detailsHtml;
+        
 
-        <h3>NICE-TO-HAVE CRITERIA</h3>
-        <p><strong>Security Vulnerability:</strong> ${distro.security_vulnerability ? 'Yes' : 'No'}</p>
-        <p><strong>Active Community:</strong> ${distro.active_community ? 'Yes' : 'No'}</p>
-
-        <h3>DETAILED SPECIFICATIONS</h3>
-        <p><strong>RAM Usage Idle:</strong> ${distro.ram_usage_idle} MB</p>
-        <p><strong>Disk Space Installed:</strong> ${distro.disk_space_installed} GB</p>
-        <p><strong>ISO Size:</strong> ${distro.iso_size} MB</p>
-        <p><strong>Boot Time:</strong> ${distro.boot_time} seconds</p>
-        <p><strong>Package Manager:</strong> ${distro.package_manager}</p>
-        <p><strong>Desktop Environments:</strong> ${distro.desktop_environments.join(', ')}</p>
-        <p><strong>Default Desktop:</strong> ${distro.default_desktop}</p>
-        <p><strong>Init System:</strong> ${distro.init_system}</p>
-        <p><strong>Kernel:</strong> ${distro.kernel}</p>
-        <p><strong>Release Model:</strong> ${distro.release_model}</p>
-        <p><strong>Release Cycle (Months):</strong> ${distro.release_cycle_months}</p>
-        <p><strong>Support Duration (Years):</strong> ${distro.support_duration_years}</p>
-        <p><strong>Update Frequency:</strong> ${distro.update_frequency}</p>
-
-        <h3>SECURITY & PRIVACY</h3>
-        <p><strong>Privacy Rating:</strong> ${distro.privacy_rating}/10</p>
-        <p><strong>Security Rating:</strong> ${distro.security_rating}/10</p>
-        <p><strong>Firewall Default:</strong> ${distro.firewall_default ? 'Yes' : 'No'}</p>
-        <p><strong>Firewall:</strong> ${distro.firewall ? 'Yes' : 'No'}</p>
-        <p><strong>Encryption Support:</strong> ${distro.encryption_support ? 'Yes' : 'No'}</p>
-        <p><strong>SELinux/AppArmor:</strong> ${distro.selinux_apparmor ? 'Yes' : 'No'}</p>
-        <p><strong>Automatic Updates:</strong> ${distro.automatic_updates}</p>
-
-        <h3>HARDWARE COMPATIBILITY</h3>
-        <p><strong>WiFi:</strong> ${distro.wifi ? 'Yes' : 'No'}</p>
-        <p><strong>Bluetooth:</strong> ${distro.bluetooth ? 'Yes' : 'No'}</p>
-        <p><strong>Touchscreen:</strong> ${distro.touchscreen ? 'Yes' : 'No'}</p>
-        <p><strong>HiDPI:</strong> ${distro.hidpi ? 'Yes' : 'No'}</p>
-        <p><strong>ARM Support:</strong> ${distro.arm_ ? 'Yes' : 'No'}</p>
-        <p><strong>Raspberry Pi Support:</strong> ${distro.raspberry ? 'Yes' : 'No'}</p>
-
-        <h3>PERFORMANCE METRICS</h3>
-        <p><strong>CPU Usage Idle:</strong> ${distro.cpu_usage_idle}%</p>
-        <p><strong>Disk I/O Performance:</strong> ${distro.disk_io_performance}/10</p>
-        <p><strong>Network Performance:</strong> ${distro.network_performance}/10</p>
-        <p><strong>Gaming Performance:</strong> ${distro.gaming_performance}/10</p>
-
-        <h3>USABILITY</h3>
-        <p><strong>Beginner Friendliness:</strong> ${distro.beginner_friendliness}/10</p>
-        <p><strong>Installer Difficulty:</strong> ${distro.installer_difficulty}/10</p>
-        <p><strong>Post Install Setup:</strong> ${distro.post_install_setup}/10</p>
-        <p><strong>GUI Tools Availability:</strong> ${distro.gui_tools_availability}/10</p>
-        <p><strong>Software Center Quality:</strong> ${distro.software_center_quality}/10</p>
-
-        <h3>DEVELOPMENT & PROFESSIONAL USE</h3>
-        <p><strong>Development Tools:</strong> ${distro.development_tools}/10</p>
-        <p><strong>Programming Languages Included:</strong> ${distro.programming_languages_included.join(', ')}</p>
-        <p><strong>Container Support:</strong> ${distro.container_support}/10</p>
-        <p><strong>Virtualization Support:</strong> ${distro.virtualization_support}/10</p>
-        <p><strong>Server Suitability:</strong> ${distro.server_suitability}/10</p>
-        <p><strong>Enterprise Features:</strong> ${distro.enterprise_features}/10</p>
-
-        <h3>MULTIMEDIA & CREATIVITY</h3>
-        <p><strong>Multimedia Codecs:</strong> ${distro.multimedia_codecs}/10</p>
-        <p><strong>Audio Quality:</strong> ${distro.audio_quality}/10</p>
-        <p><strong>Video Editing Support:</strong> ${distro.video_editing_support}/10</p>
-        <p><strong>Graphics Design Tools:</strong> ${distro.graphics_design_tools}/10</p>
-
-        <h3>ACCESSIBILITY</h3>
-        <p><strong>Screen Reader Support:</strong> ${distro.screen_reader_support}/10</p>
-        <p><strong>Keyboard Navigation:</strong> ${distro.keyboard_navigation}/10</p>
-        <p><strong>High Contrast Themes:</strong> ${distro.high_contrast_themes ? 'Yes' : 'No'}</p>
-        <p><strong>Font Scaling:</strong> ${distro.font_scaling ? 'Yes' : 'No'}</p>
-
-        <h3>LOCALIZATION</h3>
-        <p><strong>Languages Supported:</strong> ${distro.languages_supported}</p>
-        <p><strong>RTL Language Support:</strong> ${distro.rtl_language_support ? 'Yes' : 'No'}</p>
-        <p><strong>Regional Variants:</strong> ${distro.regional_variants.join(', ')}</p>
-
-        <h3>COMMUNITY & ECOSYSTEM</h3>
-        <p><strong>Forum Activity:</strong> ${distro.forum_activity}/10</p>
-        <p><strong>GitHub Activity:</strong> ${distro.github_activity}/10</p>
-        <p><strong>Commercial Support:</strong> ${distro.commercial_support ? 'Yes' : 'No'}</p>
-        <p><strong>Third Party Repositories:</strong> ${distro.third_party_repositories}/10</p>
-        <p><strong>Flatpak Support:</strong> ${distro.flatpak_support ? 'Yes' : 'No'}</p>
-        <p><strong>Snap Support:</strong> ${distro.snap_support ? 'Yes' : 'No'}</p>
-        <p><strong>AppImage Support:</strong> ${distro.appimage_support ? 'Yes' : 'No'}</p>
-
-        <h3>SPECIAL FEATURES</h3>
-        <p><strong>Live USB Support:</strong> ${distro.live_usb_support ? 'Yes' : 'No'}</p>
-        <p><strong>Persistence Support:</strong> ${distro.persistence_support ? 'Yes' : 'No'}</p>
-        <p><strong>Snapshot Rollback:</strong> ${distro.snapshot_rollback ? 'Yes' : 'No'}</p>
-        <p><strong>Immutable System:</strong> ${distro.immutable_system ? 'Yes' : 'No'}</p>
-        <p><strong>Unique Features:</strong> ${distro.unique_features.join(', ')}</p>
-        <p><strong>Target Audience:</strong> ${distro.target_audience.join(', ')}</p>
-
-        <h3>MAINTENANCE</h3>
-        <p><strong>Manual Intervention Frequency:</strong> ${distro.manual_intervention_frequency}/10</p>
-        <p><strong>Breaking Changes Frequency:</strong> ${distro.breaking_changes_frequency}/10</p>
-        <p><strong>Long Term Stability:</strong> ${distro.long_term_stability}/10</p>
-        <p><strong>Backup Tools Included:</strong> ${distro.backup_tools_included}/10</p>
-      </div>
-      <button class="close-button">Close</button>
-    `;
+    } catch (error) {
+        
+        content.innerHTML = `<p>Error displaying details for ${distro.name || 'Unknown Distro'}.</p><button class="close-button">Close</button>`;
+    }
 
     modal.style.display = 'block';
+    // Attempt to override other CSS properties that might hide the modal
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+    modal.style.position = 'fixed'; // Or 'absolute' depending on desired behavior
+    modal.style.left = '50%';
+    modal.style.top = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.zIndex = '10000'; // A very high z-index
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Semi-transparent background
 
-    // Close modal when clicking outside or on close button
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal || event.target.classList.contains('close-button')) {
-        modal.style.display = 'none';
+    // Adjust modal size
+    modal.style.width = '80%';
+    modal.style.maxWidth = '700px';
+    modal.style.maxHeight = '80vh';
+    // Ensure modalContent is scrollable and has some padding for the X button
+    content.style.backgroundColor = 'lightgreen'; // Green background for modal content
+    content.style.color = 'purple'; // Purple text for modal content
+    content.style.padding = '20px'; // General padding
+    content.style.paddingTop = '40px'; // Extra padding at the top for the X button
+    content.style.borderRadius = '8px'; // Rounded corners for a modern feel
+    content.style.maxHeight = 'calc(80vh - 40px)'; // Adjust based on padding/borders of modal-content
+    content.style.overflowY = 'auto';
+    
+
+    
+    
+    
+    
+
+
+    // Close modal when clicking outside or on close button.
+    // Using .onclick to ensure only one handler is attached, overwriting previous if any.
+    modal.onclick = (event) => {
+        
+        if (event.target === modal || event.target.classList.contains('close-button')) {
+            
+            modal.style.display = 'none';
+        }
+    };
+    
+  }
+
+  // Show a simple notification (can be enhanced later)
+  showNotification(message) {
+    
+    // For a more user-friendly notification, you might want to create a temporary element on the page
+    // or use a library. For now, a console log will suffice for debugging.
+    // Example of a simple on-page notification:
+    /*
+    const notificationElement = document.createElement('div');
+    notificationElement.className = 'notification';
+    notificationElement.textContent = message;
+    document.body.appendChild(notificationElement);
+    setTimeout(() => {
+      notificationElement.remove();
+    }, 3000);
+    */
+  }
+
+  // Update slider label highlighting
+  updateSliderLabel(labelsContainer, value) {
+    const labels = labelsContainer.querySelectorAll('span');
+    labels.forEach((label, index) => {
+      if (index === value) {
+        label.classList.add('active');
+      } else {
+        label.classList.remove('active');
       }
     });
   }
 
   // Update statistics display
   updateStats() {
-      const statsElement = document.getElementById('stats');
-      if (statsElement) {
-          statsElement.textContent = `Displaying ${this.filteredDistros.length} of ${this.allDistros.length} distributions`;
+      const filteredCountElem = document.getElementById('filtered-count');
+      const totalCountElem = document.getElementById('total-count');
+      if (filteredCountElem && totalCountElem) {
+          filteredCountElem.textContent = this.filteredDistros.length;
+          totalCountElem.textContent = this.allDistros.length;
       }
+  }
+
+  // Display active detailed filter badges (show only those with priority other than "Don't care")
+  updateActiveFilters() {
+      const container = document.querySelector('.active-filters');
+      if (!container) return;
+      container.innerHTML = '';
+      // Iterate through each detailed filter attribute element
+      document.querySelectorAll('.filter-attribute').forEach(attrDiv => {
+          const attributeName = attrDiv.dataset.attribute;
+          const formattedAttr = attributeName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const activeBtn = attrDiv.querySelector('.priority-button.active');
+          if (!activeBtn) return;
+          const priorityLabel = activeBtn.textContent.trim();
+          if (priorityLabel === "Don't care") return;
+          const badge = document.createElement('span');
+          badge.className = 'filter-badge attribute-badge';
+          badge.textContent = `${formattedAttr}: ${priorityLabel}`;
+          container.appendChild(badge);
+      });
   }
 }
 
@@ -694,7 +921,50 @@ class DistroComparator {
 document.addEventListener('DOMContentLoaded', () => {
   const app = new DistroComparator();
   Promise.all([app.loadFilterTemplate(), app.loadDistrosFromJSON()]).then(() => {
-    app.renderFilterControls();
+    // Defer filter rendering slightly to ensure DOM is fully ready for manipulation
+    setTimeout(() => {
+        app.renderFilterControls();
+    }, 0);
+    // filterDistros also calls renderTable, which should be fine as it targets a different part of the DOM
+    // and also happens after the Promise.all.
     app.filterDistros();
+      // Attach priority filter change handlers
+      ['filterNonNegotiable', 'filterImportant', 'filterNiceToHave'].forEach(id => {
+          const cb = document.getElementById(id);
+          if (cb) {
+              cb.addEventListener('change', () => {
+                  // Map checkbox id to currentFilters key
+                  const key = id === 'filterNonNegotiable' ? 'nonNegotiable' : id === 'filterImportant' ? 'important' : 'niceToHave';
+                  app.currentFilters[key] = cb.checked;
+                  app.updateActiveFilters();
+                  app.filterDistros();
+              });
+          }
+      });
+      // Initial display of active filters
+      app.updateActiveFilters();
   });
+
+  // Add collapsible functionality to Detailed Filters section
+  const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+  const filtersContent = document.getElementById('filters-content');
+  
+  if (toggleFiltersBtn && filtersContent) {
+    toggleFiltersBtn.addEventListener('click', () => {
+      filtersContent.classList.toggle('collapsed');
+      toggleFiltersBtn.textContent = filtersContent.classList.contains('collapsed') ? '►' : '▼';
+    });
+    
+    // Ensure filters expanded on load
+    filtersContent.classList.remove('collapsed');
+    toggleFiltersBtn.textContent = '▼';
+  }
+// Subsection toggles
+document.querySelectorAll('.subsection-toggle-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const subsection = button.closest('.subsection');
+        subsection.classList.toggle('collapsed');
+        button.textContent = subsection.classList.contains('collapsed') ? '►' : '▼';
+    });
+});
 });

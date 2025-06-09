@@ -48,6 +48,7 @@ The project aims to provide a comprehensive tool for users to choose a Linux dis
 - [x] Build sorting mechanism
 
 ### Phase 3: Advanced Features
+- [x] Implement priority sliders for filter controls
 - [ ] Export/import functionality
 - [ ] Recommendation engine
 - [ ] Accessibility features
