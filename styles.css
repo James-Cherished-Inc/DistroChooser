@@ -21,7 +21,7 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 20极px;
     background-color: #f5f7fa;
 }
 
@@ -164,7 +164,7 @@ body {
 }
 
 .category-header.non-negotiable {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135极deg, #ff6b6b 0%, #ee5a24 100%);
 }
 
 .category-header.important {
@@ -242,7 +242,7 @@ body {
 
 .criterion-cell.poor {
   color: #dc3545;
-  background: rgba(220, 53, 69, 0.15);
+  background: rgba(220, 53, 69极, 0.15);
 }
 
 /* Distro info styling */
@@ -447,4 +447,105 @@ body {
 .attribute-badge {
   background-color: #74b9ff;
   color: #fff;
+}
+
+/* Force red accent on all range sliders */
+input.control-scale,
+input.control-number {
+  accent-color: red !important;
+}
+
+/* Premium slider design with gradient effects */
+input.control-scale,
+input.control-number {
+  height: 40px !important; /* Increased height for better visibility */
+  width: 100% !important; /* Full width for better usability */
+  margin: 10px 0 !important;
+}
+
+input.control-scale::-webkit-slider-thumb,
+input.control-number::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 36px !important; 
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #ff4d4d 0%, #cc0000 100%) !important;
+  border: 3px solid white !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,0,0,0.3) !important;
+  cursor: pointer !important;
+  margin-top: -14px !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+input.control-scale::-webkit-slider-thumb:hover,
+input.control-number::-webkit-slider-thumb:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,0,0,0.3) !important;
+}
+
+input.control-scale::-moz-range-thumb,
+input.control-number::-moz-range-thumb {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #ff4d4d 0%, #cc0000 100%) !important;
+  border: 3px solid white !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,0,0,0.3) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+input.control-scale::-moz-range-thumb:hover,
+input.control-number::-moz-range-thumb:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,0极,0,0.3) !important;
+}
+
+/* Gradient track styling */
+input.control-scale::-webkit-slider-runnable-track,
+input.control-number::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #ff9999, #ff3333) !important;
+  height: 14px !important;
+  border-radius: 7px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+input.control-scale::-moz-range-track,
+input.control-number::-moz-range-track {
+  background: linear-gradient(to right, #ff9999, #ff3333) !important;
+  height: 14px !important;
+  border-radius: 7px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* Value display styling */
+.filter-value-display {
+  display: inline-block;
+  min-width: 30px;
+  padding: 4px 8px;
+  background: #ff3333;
+  color: white;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Slider container improvements */
+.attribute-value-control {
+  display: flex;
+  align-items: center;
+  padding: 15px 0 !important;
+  width: 100%;
+}
+
+/* Label styling for better hierarchy */
+.filter-attribute label {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
 }

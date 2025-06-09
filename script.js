@@ -240,6 +240,7 @@ class DistroComparator {
         controlElement.min = '0'; // Placeholder, will need dynamic min/max later
         controlElement.max = '100'; // Placeholder
         controlElement.value = '50'; // Default value
+        controlElement.classList.add('control-number');
         break;
       case 'scale':
         controlElement = document.createElement('input');
@@ -248,22 +249,27 @@ class DistroComparator {
         controlElement.min = '1';
         controlElement.max = '10';
         controlElement.value = '5';
+        controlElement.classList.add('control-scale');
         break;
       case 'boolean':
         controlElement = document.createElement('input');
         controlElement.type = 'checkbox';
         controlElement.id = `${attributeName}-value`;
+        controlElement.classList.add('control-boolean');
         break;
       case 'array':
       case 'string':
         controlElement = document.createElement('select');
         controlElement.id = `${attributeName}-value`;
         controlElement.multiple = true; // For array types, allow multiple selections
+        controlElement.classList.add('control-array');
         break;
       default:
         controlElement = document.createElement('div'); // Return an empty div for unknown/skipped types
         break;
     }
+    // Add a class for styling based on control type
+    controlElement.classList.add(`control-${attributeType}`);
     return controlElement;
   }
 
