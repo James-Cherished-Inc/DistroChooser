@@ -1,4 +1,18 @@
 # Changelog
+## [2025-06-09, 20:21:00 (Europe/Madrid)] Corrected Filter Logic
+* Fixed bug where detailed attribute filters were applied even if the corresponding summary checkbox was not checked.
+* Modified `filterDistros()` in [`script.js`](script.js) to ensure detailed attribute filters are only applied when the attribute's priority matches a checked summary filter (Non-Negotiable, Important, or Nice-to-Have).
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+## [2025-06-09, 20:07:00 (Europe/Madrid)] Revised Filter Logic Implementation
+* Fixed bug where summary checkboxes did not correctly filter distributions based on individual attribute priorities and values.
+* Refactored `filterDistros()` to first apply detailed attribute filters based on user-set values, then apply summary-level filters (Non-Negotiable, Important, Nice-to-Have) cumulatively.
+* Ensured dynamic handling of all distributions from `data/distros`.
+* Updated recommendation score recalculation, sorting, rendering, stats, and filter badges.
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
 
 ## [2025-06-09] Multiple Selection Enhancement
 * Enabled multiple selections for both array and string attribute types
@@ -21,7 +35,7 @@
 - [`styles.css`](styles.css)
 - [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
 
-## 2025-06-01, 02:04极:11 (Europe/Madrid)
+## 2025-06-01, 02:04:11 (Europe/Madrid)
 * Implemented core functionality of Linux distribution comparison tool
 * Created initial project structure with HTML, CSS, and JavaScript files
 * Developed interactive table with filtering and sorting capabilities
@@ -166,4 +180,24 @@ The filter controls now feature interactive sliders for each setting, providing 
 - [`script.js`](script.js)
 - [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
 - [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
+
+## [09/06/2025, 7:02:47 pm] Fix Default Filter Settings
+* Problem solved: Default filter settings were not neutral, causing unintended filtering and visibility issues with distributions.
+* How decided: Based on user feedback indicating non-neutral defaults, code analysis revealed issues in renderValueControl and filterDistros methods. Changes were proposed and approved to set neutral defaults and correct priority handling.
+* Implications: Ensures all distributions are visible by default, improving user experience by reducing bias and making the application more intuitive and user-friendly.
+* What's been implemented: Set neutral default values for all filter types in renderValueControl (e.g., booleans to false, ranges to minimum/neutral values) and fixed the filterDistros method to properly handle 'Non-negotiable' priority by removing it from the skip condition.
+* Changes made to code logic: Updated renderValueControl to initialize with neutral values and modified filterDistros to apply filtering correctly for 'Non-negotiable' priorities.
+
+### Files Modified:
+- [`script.js`](script.js)
+
+## [09/06/2025, 8:37:00 pm (Europe/Madrid)] Add Reset Icon to Active Filters Badges
+* Added a reset icon ("✕") to each active filter badge, allowing users to clear individual filter settings.
+* Implemented the resetFilter function in script.js to reset the filter to its default state.
+* Added CSS styling for the reset icon to improve visibility and usability.
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`styles.css`](styles.css)
 - [`docs/Changelog.md`](docs/Changelog.md)

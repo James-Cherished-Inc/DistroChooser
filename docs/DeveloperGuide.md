@@ -49,13 +49,18 @@ Tom Select provides:
 
 ## Filter Logic Enhancements
 
-The filtering mechanism in `script.js` has been enhanced to support dynamic attribute-specific filters, including the newly added "based_on" filter.
+The filtering mechanism in `script.js` has been enhanced to support dynamic attribute-specific filters and to correctly integrate with the priority summary checkboxes.
 
-*   **Dynamic Filter Application**: The `filterDistros()` method now iterates through all rendered filter attributes, retrieves their selected values (from range inputs, boolean switches, or Tom Select dropdowns), and applies the corresponding filtering logic to the `currentList` of distributions.
-*   **Boolean Filter Handling**: For boolean attributes, the filter is applied only if the custom UI switch is in the "on" state (representing `true`).
-*   **Number/Scale Filter Handling**: For number and scale attributes, filtering is applied if the associated priority button is set to "Important" or "Non-negotiable", ensuring that distributions meet or exceed the selected numerical value.
-*   **Array/String Filter Handling**: For array and string attributes (like "based_on" or "desktop_environments"), the Tom Select dropdown's selected values are used to filter distributions, ensuring that at least one of the selected options is present in the distribution's corresponding attribute.
-*   **Active Filter Badges**: The `updateActiveFilters()` method has been extended to display badges for all active attribute-specific filters, providing clear visual feedback to the user about the applied criteria.
+*   **Dynamic Filter Application**: The `filterDistros()` method now applies filters in a specific order:
+    1.  It starts with the list of all distributions (excluding those manually eliminated).
+    2.  It then filters this list based on the *specific values* set by the user for each detailed attribute control (e.g., filtering for distros with "Secure Boot: Yes" or "RAM: >= 8GB").
+    3.  Finally, if the summary checkboxes (Non-Negotiable, Important, Nice-to-Have) are checked, it further filters the list. A distribution must meet *all* criteria that the user has marked with the corresponding priority level (Non-negotiable, Important, or Nice-to-Have) using the individual attribute priority buttons and their associated value controls.
+*   **Boolean Filter Handling**: For boolean attributes, the filter is applied only if the custom UI switch is in the "on" state (representing `true`) AND the attribute's priority is set to "Important" or "Non-negotiable" (when the corresponding summary checkbox is checked).
+*   **Number/Scale Filter Handling**: For number and scale attributes, filtering is applied if the associated priority button is set to "Important" or "Non-negotiable" (when the corresponding summary checkbox is checked), ensuring that distributions meet or exceed the selected numerical value.
+*   **Array/String Filter Handling**: For array and string attributes (like "based_on" or "desktop_environments"), the Tom Select dropdown's selected values are used to filter distributions. This filter is applied as part of the detailed attribute filtering step. If the attribute's priority is also set to "Important" or "Non-negotiable" and the corresponding summary checkbox is checked, the distribution must contain at least one of the selected options to pass that summary filter level.
+*   **Active Filter Badges**: The `updateActiveFilters()` method displays badges for all active attribute-specific filters, providing clear visual feedback to the user about the applied criteria.
+
+This revised logic ensures that the summary checkboxes accurately reflect the combined effect of user-defined priorities and values for individual attributes.
 
 ## Recommendation Scoring Algorithm
 The Recommendation Engine calculates a score for each distribution based on how well it matches the user's "Nice-to-Have" and "Important" criteria. The algorithm:

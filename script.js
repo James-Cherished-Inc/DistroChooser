@@ -258,7 +258,7 @@ class DistroComparator {
         controlElement.min = '1';
         controlElement.max = '10';
         // Set neutral default to middle value for scale attributes
-        controlElement.value = '5'; // Neutral middle, but consider adjusting based on range if needed
+        controlElement.value = '1'; // Neutral minimum set to 1 as per user requirement for range defaults
         controlElement.classList.add('control-scale');
         break;
       case 'boolean':
@@ -554,92 +554,92 @@ class DistroComparator {
     }
   }
   filterDistros() {
-    // Ensure allDistros is populated before proceeding
-    if (!this.allDistros || this.allDistros.length === 0) {
-      return; // Exit the function if data is not ready
-    }
+    // Ensure data is ready
+    if (!this.allDistros || this.allDistros.length === 0) return;
 
-    // Start with all distros
-    let currentList = [...this.allDistros];
+    // Base list minus eliminated distros
+    let list = this.allDistros.filter(d => !this.eliminatedDistros.has(d.name));
 
-    // Filter out eliminated distros
-    currentList = currentList.filter(distro => !this.eliminatedDistros.has(distro.name));
+    // Reset attribute filter store
+    this.currentFilters.attributeFilters = {};
 
-    // Apply priority summary filters based on selected checkboxes
-    if (this.currentFilters.nonNegotiable) {
-        currentList = currentList.filter(distro => this.calculateScores(distro).nonNegotiable === 100);
-    }
-    if (this.currentFilters.important) {
-        currentList = currentList.filter(distro => this.calculateScores(distro).important === 100);
-    }
-    if (this.currentFilters.niceToHave) {
-        currentList = currentList.filter(distro => this.calculateScores(distro).niceToHave === 100);
-    }
-
-    // Apply dynamic attribute filters
+    // Apply detailed filters (only if corresponding summary checkbox is checked)
     document.querySelectorAll('.filter-attribute').forEach(attrDiv => {
-        const attributeName = attrDiv.dataset.attribute;
-        const attributeType = attrDiv.dataset.type;
-        let filterValue;
+      const name = attrDiv.dataset.attribute;
+      const type = attrDiv.dataset.type;
+      // Determine if this attribute's filter should apply based on its priority and summary checkbox
+      const pBtn = attrDiv.querySelector('.priority-button.active');
+      const pVal = pBtn ? parseInt(pBtn.dataset.value, 10) : 1; // Default to "Don't care" if no button active
+      const applyFilter = (pVal === 4 && this.currentFilters.nonNegotiable) ||
+                          (pVal === 3 && this.currentFilters.important) ||
+                          (pVal === 2 && this.currentFilters.niceToHave);
+      let val, active = false; // Initialize active to false
 
-        if (attributeType === 'boolean') {
-            const switchContainer = attrDiv.querySelector('.custom-switch');
-            // Only apply filter if the switch is 'on' (meaning the user wants to filter for 'true')
-            // If the switch is 'off', it means 'false' or 'don't care', so we don't filter by it.
-            filterValue = switchContainer.classList.contains('on');
-            if (filterValue) { // Only filter if the boolean is true
-                currentList = currentList.filter(distro => distro[attributeName] === true);
-            }
-        } else if (attributeType === 'number' || attributeType === 'scale') {
-            const rangeInput = attrDiv.querySelector('input[type="range"]');
-            filterValue = parseInt(rangeInput.value);
-            // Apply filter if the value is not the default "don't care" (e.g., 0 for number, 5 for scale)
-            // This needs to be refined based on actual "don't care" values for each range.
-            // For now, assuming any selection means a filter.
-            // This logic needs to be more sophisticated for ranges (e.g., filter distros where attribute >= filterValue)
-            // If the priority is "Non-negotiable", then the distro's value must be >= filterValue
-            const activePriorityButton = attrDiv.querySelector('.priority-button.active');
-            const priorityValue = activePriorityButton ? parseInt(activePriorityButton.dataset.value) : 1; // Default to "Don't care"
-
-            if (priorityValue >= 3) { // "Important" or "Non-negotiable"
-                currentList = currentList.filter(distro => {
-                    const distroValue = distro[attributeName];
-                    return typeof distroValue === 'number' && distroValue >= filterValue;
-                });
-            }
-        } else if (attributeType === 'array' || attributeType === 'string') {
-            const selectElement = attrDiv.querySelector('select.tom-select');
-            if (selectElement && selectElement.tomselect) {
-                filterValue = selectElement.tomselect.getValue();
-                if (filterValue && filterValue.length > 0) {
-                    currentList = currentList.filter(distro => {
-                        const distroValues = Array.isArray(distro[attributeName]) ? distro[attributeName] : [distro[attributeName]];
-                        // Check if any selected filter value is present in the distro's values
-                        return filterValue.some(val => distroValues.includes(val));
-                    });
-                }
-            }
+      if (type === 'boolean') {
+        const sw = attrDiv.querySelector('.custom-switch');
+        val = sw.classList.contains('on');
+        active = val; // A boolean filter is active if the switch is 'on'
+        if (applyFilter && active) {
+          list = list.filter(d => d[name] === true);
         }
-        // Store the active filter value for display in badges
-        this.currentFilters.attributeFilters[attributeName] = filterValue;
+      } else if (type === 'number' || type === 'scale') {
+        const inp = attrDiv.querySelector('input[type="range"]');
+        val = parseInt(inp.value, 10);
+        const def = parseInt(inp.min, 10);
+        active = val > def; // A range filter is active if the value is not the minimum
+        if (applyFilter && active) {
+          list = list.filter(d => typeof d[name] === 'number' && d[name] >= val);
+        }
+      } else { // array or string
+        const sel = attrDiv.querySelector('select.tom-select');
+        val = sel && sel.tomselect ? sel.tomselect.getValue() : [];
+        active = Array.isArray(val) && val.length > 0; // A select filter is active if options are selected
+        if (applyFilter && active) {
+          list = list.filter(d => {
+            const dvd = Array.isArray(d[name]) ? d[name] : [d[name]];
+            // Use 'some' for OR logic when applying filters based on summary checkboxes
+            return Array.isArray(val) && val.some(v => dvd.includes(v));
+          });
+        }
+      }
+
+      this.currentFilters.attributeFilters[name] = val;
     });
 
-    this.filteredDistros = currentList;
-
-    // Calculate recommendation scores for the remaining distros
-    this.filteredDistros.forEach(distro => {
-        distro.recommendationScore = this.calculateRecommendationScore(distro);
+    // Apply summary filters in order: NN (4), Important (3), Nice-to-Have (2)
+    [
+      { key: 'nonNegotiable', level: '4' },
+      { key: 'important', level: '3' },
+      { key: 'niceToHave', level: '2' }
+    ].forEach(({ key, level }) => {
+      if (this.currentFilters[key]) {
+        document.querySelectorAll('.filter-attribute').forEach(attrDiv => {
+          const btn = attrDiv.querySelector('.priority-button.active');
+          if (btn && btn.dataset.value === level) {
+            const name = attrDiv.dataset.attribute;
+            const type = attrDiv.dataset.type;
+            const filterVal = this.currentFilters.attributeFilters[name];
+            if (filterVal == null) return;
+            if (type === 'boolean') {
+              list = list.filter(d => d[name] === true);
+            } else if (type === 'number' || type === 'scale') {
+              list = list.filter(d => typeof d[name] === 'number' && d[name] >= filterVal);
+            } else {
+              list = list.filter(d => {
+                const dvd = Array.isArray(d[name]) ? d[name] : [d[name]];
+                return Array.isArray(filterVal) && filterVal.some(v => dvd.includes(v));
+              });
+            }
+          }
+        });
+      }
     });
 
-    // Apply sorting
+    this.filteredDistros = list;
+    this.filteredDistros.forEach(d => d.recommendationScore = this.calculateRecommendationScore(d));
     this.sortDistros();
-
-    // Render the table with filtered and sorted data
     this.renderTable();
-
-    // Update the displayed count
     this.updateStats();
-    // Update active filter badges
     this.updateActiveFilters();
   }
 
@@ -1069,6 +1069,16 @@ class DistroComparator {
           badge.className = 'filter-badge attribute-badge';
           badge.textContent = `${formattedAttr}: ${priorityLabel}`;
           container.appendChild(badge);
+          // Add reset icon to badge for priority filter
+          const resetIcon = document.createElement('span');
+          resetIcon.className = 'reset-icon';
+          resetIcon.textContent = ' ✕';
+          resetIcon.title = 'Reset filter';
+          resetIcon.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.resetFilter(attributeName);
+          });
+          badge.appendChild(resetIcon);
       });
  
       // Display attribute-specific filters
@@ -1083,8 +1093,48 @@ class DistroComparator {
               badge.className = 'filter-badge attribute-badge';
               badge.textContent = `${formattedAttr}: ${displayValue}`;
               container.appendChild(badge);
+              // Add reset icon to badge for value filter
+              const resetIcon = document.createElement('span');
+              resetIcon.className = 'reset-icon';
+              resetIcon.textContent = ' ✕';
+              resetIcon.title = 'Reset filter';
+              resetIcon.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  this.resetFilter(attributeName);
+              });
+              badge.appendChild(resetIcon);
           }
       }
+  }
+  // Reset a filter attribute to default values
+  resetFilter(attributeName) {
+      const attrDiv = document.querySelector(`.filter-attribute[data-attribute="${attributeName}"]`);
+      if (!attrDiv) return;
+      // Reset priority buttons to default ("Don't care" = value 1)
+      const buttons = attrDiv.querySelectorAll('.priority-button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      buttons.forEach(btn => {
+          if (btn.dataset.value === '1') btn.classList.add('active');
+      });
+      // Reset value control to default
+      const type = attrDiv.dataset.type;
+      if (type === 'boolean') {
+          const sw = attrDiv.querySelector('.custom-switch');
+          if (sw.classList.contains('on')) {
+              sw.click(); // toggle off to false
+          }
+      } else if (type === 'number' || type === 'scale') {
+          const inp = attrDiv.querySelector('input[type="range"]');
+          inp.value = inp.min;
+          inp.dispatchEvent(new Event('input'));
+      } else {
+          const select = attrDiv.querySelector('select.tom-select');
+          if (select && select.tomselect) {
+              select.tomselect.clear();
+          }
+      }
+      this.filterDistros();
+      this.updateActiveFilters();
   }
 }
  
@@ -1092,28 +1142,44 @@ class DistroComparator {
  document.addEventListener('DOMContentLoaded', () => {
    const app = new DistroComparator();
    Promise.all([app.loadFilterTemplate(), app.loadDistrosFromJSON()]).then(() => {
+     // Initialize currentFilters based on checkbox states after DOM is ready and data loaded
+     const nonNegotiableCb = document.getElementById('filterNonNegotiable');
+     const importantCb = document.getElementById('filterImportant');
+     const niceToHaveCb = document.getElementById('filterNiceToHave');
+     if (nonNegotiableCb) app.currentFilters.nonNegotiable = nonNegotiableCb.checked;
+     if (importantCb) app.currentFilters.important = importantCb.checked;
+     if (niceToHaveCb) app.currentFilters.niceToHave = niceToHaveCb.checked;
+     
      // Defer filter rendering slightly to ensure DOM is fully ready for manipulation
      setTimeout(() => {
          app.renderFilterControls();
      }, 0);
-     // filterDistros also calls renderTable, which should be fine as it targets a different part of the DOM
-     // and also happens after the Promise.all.
+     // Apply initial filter based on current state
      app.filterDistros();
-       // Attach priority filter change handlers
-       ['filterNonNegotiable', 'filterImportant', 'filterNiceToHave'].forEach(id => {
-           const cb = document.getElementById(id);
-           if (cb) {
-               cb.addEventListener('change', () => {
-                   // Map checkbox id to currentFilters key
-                   const key = id === 'filterNonNegotiable' ? 'nonNegotiable' : id === 'filterImportant' ? 'important' : 'niceToHave';
-                   app.currentFilters[key] = cb.checked;
-                   app.updateActiveFilters();
-                   app.filterDistros();
-               });
-           }
-       });
-       // Initial display of active filters
-       app.updateActiveFilters();
+     // Attach priority filter change handlers
+     ['filterNonNegotiable', 'filterImportant', 'filterNiceToHave'].forEach(id => {
+         const cb = document.getElementById(id);
+         if (cb) {
+             cb.addEventListener('change', () => {
+                 // Map checkbox id to currentFilters key
+                 const key = id === 'filterNonNegotiable' ? 'nonNegotiable' : id === 'filterImportant' ? 'important' : 'niceToHave';
+                 app.currentFilters[key] = cb.checked;
+                 app.updateActiveFilters();
+                 app.filterDistros();
+             });
+         }
+     });
+     // Initial display of active filters
+     app.updateActiveFilters();
+// Add event listeners for scroll arrows inside DOMContentLoaded
+document.getElementById('scroll-to-top').addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('scroll-to-bottom').addEventListener('click', () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+});
+// Removed duplicate event listeners to fix errors and prevent null reference issues.
    });
  
    // Add collapsible functionality to Detailed Filters section
@@ -1130,12 +1196,12 @@ class DistroComparator {
      filtersContent.classList.remove('collapsed');
      toggleFiltersBtn.textContent = '▼';
    }
- // Subsection toggles
- document.querySelectorAll('.subsection-toggle-btn').forEach(button => {
-     button.addEventListener('click', () => {
-         const subsection = button.closest('.subsection');
-         subsection.classList.toggle('collapsed');
-         button.textContent = subsection.classList.contains('collapsed') ? '►' : '▼';
-     });
- });
+   // Subsection toggles
+   document.querySelectorAll('.subsection-toggle-btn').forEach(button => {
+       button.addEventListener('click', () => {
+           const subsection = button.closest('.subsection');
+           subsection.classList.toggle('collapsed');
+           button.textContent = subsection.classList.contains('collapsed') ? '►' : '▼';
+       });
+   });
  });

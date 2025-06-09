@@ -617,3 +617,52 @@ input.control-number::-moz-range-track {
     padding: 0.5rem;
 }
 /* Additional styling for dropdown states */
+
+/* Style for reset icon in active filters badges */
+.reset-icon {
+    cursor: pointer;
+    margin-left: 5px;
+    color: red; /* Make it red to stand out as a reset action */
+    font-size: 1.2em; /* Slightly larger for better touch targets and visibility */
+    vertical-align: middle; /* Align with the badge text */
+    user-select: none; /* Prevent text selection when clicking */
+}
+.reset-icon:hover {
+    color: darkred; /* Darker shade on hover for visual feedback */
+    opacity: 0.8; /* Slight fade for hover effect */
+}
+/* Styles for scroll arrows */
+#scroll-arrows {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+#scroll-arrows button {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#scroll-arrows button:hover {
+  background-color: #0056b3;
+  transform: scale(1.1);
+}
+
+#scroll-arrows button:active {
+  transform: scale(0.95);
+}
