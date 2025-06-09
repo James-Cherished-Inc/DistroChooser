@@ -9,26 +9,6 @@
 <body>
     <div class="distro-comparison-container">
         <div class="filter-controls">
-            <div class="priority-filters">
-                <label>
-                    <input type="checkbox" id="filterNonNegotiable" checked>
-                    Show only distributions meeting NON-NEGOTIABLE criteria
-                </label>
-                <label>
-                    <input type="checkbox" id="filterImportant">
-                    + Must meet IMPORTANT criteria
-                </label>
-                <label>
-                    <input type="checkbox" id="filterNiceToHave">
-                    + Must meet NICE-TO-HAVE criteria
-                </label>
-            </div>
-            <div class="state-controls">
-                <button id="exportStateBtn">Export State</button>
-                <input type="file" id="importStateInput" accept=".json" style="display: none;">
-                <button id="importStateBtn">Import State</button>
-            </div>
-            <div id="stats"></div> <!-- Placeholder for statistics -->
 
             <div class="detailed-filters" id="detailed-filters">
                 <div class="filters-header">
@@ -37,120 +17,208 @@
                 </div>
                 <div id="filters-content">
 
-                <div class="filter-category">
-                    <h3>General Info</h3>
-                    <div class="filter-placeholder" id="general-info-filters">
+                <div class="filter-category subsection" id="general-info-section">
+                    <div class="subsection-header">
+                        <h3>General Info</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="general-info-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>SYSTEM REQUIREMENTS</h3>
-                    <div class="filter-placeholder" id="system-requirements-filters">
+                <div class="filter-category subsection" id="system-requirements-section">
+                    <div class="subsection-header">
+                        <h3>SYSTEM REQUIREMENTS</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="system-requirements-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>NON-NEGOTIABLE CRITERIA</h3>
-                    <div class="filter-placeholder" id="non-negotiable-criteria-filters">
+                <div class="filter-category subsection" id="non-negotiable-section">
+                    <div class="subsection-header">
+                        <h3>NON-NEGOTIABLE CRITERIA</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="non-negotiable-criteria-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>IMPORTANT CRITERIA</h3>
-                    <div class="filter-placeholder" id="important-criteria-filters">
+                <div class="filter-category subsection" id="important-criteria-section">
+                    <div class="subsection-header">
+                        <h3>IMPORTANT CRITERIA</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="important-criteria-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>NICE-TO-HAVE CRITERIA</h3>
-                    <div class="filter-placeholder" id="nice-to-have-criteria-filters">
+                <div class="filter-category subsection" id="nice-to-have-section">
+                    <div class="subsection-header">
+                        <h3>NICE-TO-HAVE CRITERIA</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="nice-to-have-criteria-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>DETAILED SPECIFICATIONS</h3>
-                    <div class="filter-placeholder" id="detailed-specifications-filters">
+                <div class="filter-category subsection" id="detailed-specifications-section">
+                    <div class="subsection-header">
+                        <h3>DETAILED SPECIFICATIONS</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="detailed-specifications-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>SECURITY & PRIVACY</h3>
-                    <div class="filter-placeholder" id="security-privacy-filters">
+                <div class="filter-category subsection" id="security-privacy-section">
+                    <div class="subsection-header">
+                        <h3>SECURITY & PRIVACY</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="security-privacy-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>HARDWARE COMPATIBILITY</h3>
-                    <div class="filter-placeholder" id="hardware-compatibility-filters">
+                <div class="filter-category subsection" id="hardware-compatibility-section">
+                    <div class="subsection-header">
+                        <h3>HARDWARE COMPATIBILITY</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="hardware-compatibility-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>PERFORMANCE METRICS</h3>
-                    <div class="filter-placeholder" id="performance-metrics-filters">
+                <div class="filter-category subsection" id="performance-metrics-section">
+                    <div class="subsection-header">
+                        <h3>PERFORMANCE METRICS</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="performance-metrics-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>USABILITY</h3>
-                    <div class="filter-placeholder" id="usability-filters">
+                <div class="filter-category subsection" id="usability-section">
+                    <div class="subsection-header">
+                        <h3>USABILITY</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="usability-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>DEVELOPMENT & PROFESSIONAL USE</h3>
-                    <div class="filter-placeholder" id="development-professional-use-filters">
+                <div class="filter-category subsection" id="development-professional-use-section">
+                    <div class="subsection-header">
+                        <h3>DEVELOPMENT & PROFESSIONAL USE</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="development-professional-use-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>MULTIMEDIA & CREATIVITY</h3>
-                    <div class="filter-placeholder" id="multimedia-creativity-filters">
+                <div class="filter-category subsection" id="multimedia-creativity-section">
+                    <div class="subsection-header">
+                        <h3>MULTIMEDIA & CREATIVITY</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="multimedia-creativity-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>ACCESSIBILITY</h3>
-                    <div class="filter-placeholder" id="accessibility-filters">
+                <div class="filter-category subsection" id="accessibility-section">
+                    <div class="subsection-header">
+                        <h3>ACCESSIBILITY</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="accessibility-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>LOCALIZATION</h3>
-                    <div class="filter-placeholder" id="localization-filters">
+                <div class="filter-category subsection" id="localization-section">
+                    <div class="subsection-header">
+                        <h3>LOCALIZATION</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="localization-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>COMMUNITY & ECOSYSTEM</h3>
-                    <div class="filter-placeholder" id="community-ecosystem-filters">
+                <div class="filter-category subsection" id="community-ecosystem-section">
+                    <div class="subsection-header">
+                        <h3>COMMUNITY & ECOSYSTEM</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="community-ecosystem-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>SPECIAL FEATURES</h3>
-                    <div class="filter-placeholder" id="special-features-filters">
+                <div class="filter-category subsection" id="special-features-section">
+                    <div class="subsection-header">
+                        <h3>SPECIAL FEATURES</h3>
+                        <button class="subsection-toggle-btn">▼</button>
+                    </div>
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="special-features-filters"></div>
                     </div>
                 </div>
 
-                <div class="filter-category">
-                    <h3>MAINTENANCE</h3>
-                    <div class="filter-placeholder" id="maintenance-filters">
+                <div class="filter-category subsection" id="maintenance-section">
+                    <div class="subsection-header">
+                        <h3>MAINTENANCE</h3>
+                        <button class="subsection-toggle-btn">▼</button>
                     </div>
-                    </div> <!-- end filters-content -->
+                    <div class="subsection-content">
+                        <div class="filter-placeholder" id="maintenance-filters"></div>
+                    </div>
                 </div>
             </div>
+
+            <div class="active-filters">
+                <!-- Display user-selected filter criteria badges -->
+            </div>
+            <p id="stats">Displaying <span id="filtered-count">0</span> of <span id="total-count">0</span> distributions</p>
+            <div class="priority-controls-container">
+                <div class="state-controls">
+                    <button id="exportStateBtn">Export State</button>
+                    <input type="file" id="importStateInput" accept=".json" style="display: none;">
+                    <button id="importStateBtn">Import State</button>
+                </div>
+                <div class="priority-filters">
+                    <label>
+                        <input type="checkbox" id="filterNonNegotiable" checked>
+                        Show only distributions meeting NON-NEGOTIABLE criteria
+                    </label>
+                    <label>
+                        <input type="checkbox" id="filterImportant">
+                        + Must meet IMPORTANT criteria
+                    </label>
+                    <label>
+                        <input type="checkbox" id="filterNiceToHave">
+                        + Must meet NICE-TO-HAVE criteria
+                    </label>
+                </div>
+            </div>
+
+
         </div>
     </div>
 
     <main>
-      <section id="filters">
-        <h2>Filters</h2>
-        <div id="filter-controls">
-          <!-- Filter controls will be dynamically added here -->
-        </div>
-      </section>
-
       <section id="distributions">
         <h2>Distributions</h2>
         <div id="table-container">
@@ -168,7 +236,7 @@
             </tbody>
           </table>
         </div>
-        <p>Displaying <span id="filtered-count">0</span> of <span id="total-count">0</span> distributions</p>
+        <!-- deleted because relocated stats display below active filters -->
       </section>
     </main>
 

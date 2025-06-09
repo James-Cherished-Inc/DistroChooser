@@ -81,3 +81,21 @@ The filter controls now feature interactive sliders for each setting, providing 
 
 ### Files Modified:
 - [`script.js`](script.js)
+
+---
+
+## 09/06/2025, 12:52:18 pm (Europe/Madrid)
+* Fixed frontend display issues related to active filters and distribution count.
+
+### Details:
+- Selected priority filters were not displaying in the `.active-filters` div.
+- The distribution count display ("Displaying 0 of 0 distributions") was not updating correctly and was positioned incorrectly.
+
+### Changes Made:
+- In [`script.js`](script.js), the [`updateStats`](script.js) function was refactored to target specific span elements (`#filtered-count` and `#total-count`) within the distribution count paragraph.
+- In [`index.html`](index.html), the distribution count paragraph was moved to be immediately below the `.active-filters` div and updated to include the `#filtered-count` and `#total-count` span elements.
+- Verified that filter change listeners correctly trigger the update of both active filters and the distribution count.
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`index.html`](index.html)

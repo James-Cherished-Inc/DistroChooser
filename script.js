@@ -888,9 +888,11 @@ class DistroComparator {
 
   // Update statistics display
   updateStats() {
-      const statsElement = document.getElementById('stats');
-      if (statsElement) {
-          statsElement.textContent = `Displaying ${this.filteredDistros.length} of ${this.allDistros.length} distributions`;
+      const filteredCountElem = document.getElementById('filtered-count');
+      const totalCountElem = document.getElementById('total-count');
+      if (filteredCountElem && totalCountElem) {
+          filteredCountElem.textContent = this.filteredDistros.length;
+          totalCountElem.textContent = this.allDistros.length;
       }
   }
 
