@@ -402,10 +402,16 @@ class DistroComparator {
       niceToHave: categoryMappings.niceToHave.length * 10
     };
 
-    // Calculate scores for each category
+    // Calculate scores for each category, including boolean handling for non-negotiable
     categoryMappings.nonNegotiable.forEach(prop => {
-      if (distro[prop] !== undefined) {
-        scores.nonNegotiable += typeof distro[prop] === 'number' ? distro[prop] : 0;
+      const value = distro[prop];
+      if (value !== undefined) {
+        if (typeof value === 'number') {
+          scores.nonNegotiable += value;
+        } else if (typeof value === 'boolean') {
+          // Boolean non-negotiable criteria count as full score (10) if true
+          scores.nonNegotiable += value ? 10 : 0;
+        }
       }
     });
 
@@ -451,12 +457,25 @@ class DistroComparator {
     // Filter out eliminated distros
     currentList = currentList.filter(distro => !this.eliminatedDistros.has(distro.name));
     console.log('List count after elimination filter:', currentList.length);
+
+    // Apply priority summary filters based on selected checkboxes
+    if (this.currentFilters.nonNegotiable) {
+        currentList = currentList.filter(distro => this.calculateScores(distro).nonNegotiable === 100);
+    }
+    if (this.currentFilters.important) {
+        currentList = currentList.filter(distro => this.calculateScores(distro).important === 100);
+    }
+    if (this.currentFilters.niceToHave) {
+        currentList = currentList.filter(distro => this.calculateScores(distro).niceToHave === 100);
+    }
+
+    // Apply sorting before rendering
+    this.sortDistros();
     
     this.filteredDistros = currentList;
     console.log('Initial filteredDistros count (after elimination):', this.filteredDistros.length);
 
-    // Apply filters
-    // ... filtering logic ...
+    // NOTE: static summary filters applied above; dynamic attribute filters can be added here
 
     // Apply sorting
     // ... sorting logic ...
@@ -874,6 +893,31 @@ class DistroComparator {
           statsElement.textContent = `Displaying ${this.filteredDistros.length} of ${this.allDistros.length} distributions`;
       }
   }
+
+  // Display active priority filter badges
+  updateActiveFilters() {
+      const container = document.querySelector('.active-filters');
+      if (!container) return;
+      container.innerHTML = '';
+      if (this.currentFilters.nonNegotiable) {
+          const badge = document.createElement('span');
+          badge.className = 'filter-badge non-negotiable';
+          badge.textContent = 'Non-Negotiable';
+          container.appendChild(badge);
+      }
+      if (this.currentFilters.important) {
+          const badge = document.createElement('span');
+          badge.className = 'filter-badge important';
+          badge.textContent = 'Important';
+          container.appendChild(badge);
+      }
+      if (this.currentFilters.niceToHave) {
+          const badge = document.createElement('span');
+          badge.className = 'filter-badge nice-to-have';
+          badge.textContent = 'Nice-To-Have';
+          container.appendChild(badge);
+      }
+  }
 }
 
 // Initialize application when DOM is loaded
@@ -882,12 +926,26 @@ document.addEventListener('DOMContentLoaded', () => {
   Promise.all([app.loadFilterTemplate(), app.loadDistrosFromJSON()]).then(() => {
     // Defer filter rendering slightly to ensure DOM is fully ready for manipulation
     setTimeout(() => {
-        console.log('DOMContentLoaded: setTimeout callback: Calling renderFilterControls()');
         app.renderFilterControls();
     }, 0);
     // filterDistros also calls renderTable, which should be fine as it targets a different part of the DOM
     // and also happens after the Promise.all.
     app.filterDistros();
+      // Attach priority filter change handlers
+      ['filterNonNegotiable', 'filterImportant', 'filterNiceToHave'].forEach(id => {
+          const cb = document.getElementById(id);
+          if (cb) {
+              cb.addEventListener('change', () => {
+                  // Map checkbox id to currentFilters key
+                  const key = id === 'filterNonNegotiable' ? 'nonNegotiable' : id === 'filterImportant' ? 'important' : 'niceToHave';
+                  app.currentFilters[key] = cb.checked;
+                  app.updateActiveFilters();
+                  app.filterDistros();
+              });
+          }
+      });
+      // Initial display of active filters
+      app.updateActiveFilters();
   });
 
   // Add collapsible functionality to Detailed Filters section
@@ -900,8 +958,16 @@ document.addEventListener('DOMContentLoaded', () => {
       toggleFiltersBtn.textContent = filtersContent.classList.contains('collapsed') ? '►' : '▼';
     });
     
-    // Start with filters expanded
+    // Ensure filters expanded on load
     filtersContent.classList.remove('collapsed');
     toggleFiltersBtn.textContent = '▼';
   }
+// Subsection toggles
+document.querySelectorAll('.subsection-toggle-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const subsection = button.closest('.subsection');
+        subsection.classList.toggle('collapsed');
+        button.textContent = subsection.classList.contains('collapsed') ? '►' : '▼';
+    });
+});
 });

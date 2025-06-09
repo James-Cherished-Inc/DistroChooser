@@ -68,3 +68,16 @@ The `.gitignore` file has been added to the project to ensure that temporary fil
 - [`script.js`](script.js): Implemented JavaScript logic for slider initialization, value handling, and updating filter state based on slider input.
 
 The filter controls now feature interactive sliders for each setting, providing a more intuitive way to select priority levels. The visual styling highlights the active priority level.
+
+---
+
+## 09/06/2025, 12:43:38 pm (Europe/Madrid)
+* Fixed bug where filter priorities (Non-Negotiable, Important, Nice-to-Have) were not correctly filtering distributions or updating the active filters display.
+
+### Details:
+- Enhanced the [`calculateScores`](script.js) function in [`script.js`](script.js) to correctly handle boolean criteria for scoring.
+- Modified the [`filterDistros`](script.js) function in [`script.js`](script.js) to apply filtering based on the active priority levels (Non-Negotiable, Important, Nice-to-Have) by checking if a distribution's calculated score for that priority level is 100%.
+- Confirmed that the [`updateActiveFilters`](script.js) function correctly displays the active priority badges.
+
+### Files Modified:
+- [`script.js`](script.js)
