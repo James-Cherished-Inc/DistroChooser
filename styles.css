@@ -467,14 +467,14 @@ input.control-scale::-webkit-slider-thumb,
 input.control-number::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;
-  width: 36px !important; 
+  width: 36px !important;
   height: 36px !important;
   border-radius: 50% !important;
   background: radial-gradient(circle, #ff4d4d 0%, #cc0000 100%) !important;
   border: 3px solid white !important;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,0,0,0.3) !important;
   cursor: pointer !important;
-  margin-top: -14px !important;
+  margin-top: -10px !important; /* Adjusted for better alignment */
   transition: transform 0.2s, box-shadow 0.2s !important;
 }
 
@@ -494,12 +494,13 @@ input.control-number::-moz-range-thumb {
   box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,0,0,0.3) !important;
   cursor: pointer !important;
   transition: transform 0.2s, box-shadow 0.2s !important;
+  margin-top: -8px !important;
 }
 
 input.control-scale::-moz-range-thumb:hover,
 input.control-number::-moz-range-thumb:hover {
   transform: scale(1.1) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,0极,0,0.3) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,0,0,0.3) !important;
 }
 
 /* Gradient track styling */
@@ -549,3 +550,70 @@ input.control-number::-moz-range-track {
   margin-bottom: 8px;
   display: block;
 }
+
+/* Custom Switch Styles */
+.custom-switch {
+     position: relative;
+     display: inline-block;
+     width: 80px; /* Increased width */
+     height: 34px; /* Adjust height as needed */
+     background-color: #007bff; /* Off state background (blue) */
+    border-radius: 34px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    vertical-align: middle; /* Align with label */
+}
+
+.custom-switch.on {
+    background-color: #28a745; /* On state background (Success green) */
+}
+
+.custom-switch .switch-toggle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 26px; /* Adjust size as needed */
+    height: 26px; /* Adjust size as needed */
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.custom-switch.on .switch-toggle {
+    transform: translateX(46px); /* Move toggle to the right (New width - toggle width - padding*2) */
+}
+
+.custom-switch .switch-label {
+    position: absolute;
+    top: 50%;
+    left: 50%; /* Center the label horizontally */
+    transform: translate(-50%, -50%); /* Center the label vertically and horizontally */
+    font-size: 12px; /* Adjust font size */
+    font-weight: bold;
+    color: white; /* Text color */
+    text-align: center;
+    width: 100%; /* Allow label to take full width for centering */
+    pointer-events: none; /* Allow clicks to pass through to the switch */
+    z-index: 1; /* Ensure label is above toggle */
+}
+
+.custom-switch.on .switch-label {
+     /* Label is already centered, no specific adjustment needed for 'True' */
+}
+
+/* deleted because: switch label should remain white in both states */
+/* .custom-switch:not(.on) .switch-label {
+    color: #dc3545;
+} */
+
+.custom-switch:not(.on) {
+    background-color: #007bff !important; /* Off state background (blue) */
+}
+
+/* Tom Select Styles */
+.ts-control {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+}
+/* Additional styling for dropdown states */

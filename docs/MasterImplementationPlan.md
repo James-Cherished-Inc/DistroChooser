@@ -20,7 +20,7 @@ The project aims to provide a comprehensive tool for users to choose a Linux dis
 
 *   **Phase 3: Advanced Features (In Progress)**
     *   Export/Import Functionality
-    *   Recommendation Engine
+    *   Recommendation Engine (Plan Complete - See [`docs/RecommendationEnginePlan.md`](docs/RecommendationEnginePlan.md))
     *   Accessibility Features
     *   Performance Optimizations
     *   Improve Mobile Responsiveness

@@ -1,6 +1,27 @@
 # Changelog
 
-## 2025-06-01, 02:04:11 (Europe/Madrid)
+## [2025-06-09] Multiple Selection Enhancement
+* Enabled multiple selections for both array and string attribute types
+* Updated Tom Select dropdowns to support multi-select for most options
+
+### Files Modified:
+- [`script.js`](script.js)
+
+## [2025-06-09] Tom Select Integration
+* Replaced custom dropdowns with Tom Select library (v2.3.1)
+* Improved accessibility and UX for parameter selection
+* Added CDN links to Tom Select in index.html
+* Modified renderValueControl and populateSelectOptions in script.js
+* Added custom styles for Tom Select in styles.css
+* Updated Developer Guide with integration details
+
+### Files Modified:
+- [`index.html`](index.html)
+- [`script.js`](script.js)
+- [`styles.css`](styles.css)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+
+## 2025-06-01, 02:04极:11 (Europe/Madrid)
 * Implemented core functionality of Linux distribution comparison tool
 * Created initial project structure with HTML, CSS, and JavaScript files
 * Developed interactive table with filtering and sorting capabilities
@@ -111,4 +132,25 @@ The filter controls now feature interactive sliders for each setting, providing 
 
 ### Files Modified:
 - [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+
+## [2025-06-09] "Based On" Filter Control
+* Added a filter control for the "based_on" criteria in the Detailed Filters section.
+* Ensured the filter functions as a multiple-choice selector, similar to other array filters.
+* Updated `script.js` to correctly render and apply the "based_on" filter.
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+
+## [09/06/2025] Recommendation Engine Plan Documentation
+
+*   Created a detailed plan for the Recommendation Engine implementation.
+*   Updated documentation files to reflect the new plan and project status.
+
+### Files Modified:
+- [`docs/RecommendationEnginePlan.md`](docs/RecommendationEnginePlan.md) (New File)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
 - [`docs/Changelog.md`](docs/Changelog.md)

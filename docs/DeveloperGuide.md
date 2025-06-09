@@ -32,6 +32,31 @@ The distribution data is stored in JSON files within the `data/distros/` directo
 
 The `data/template.json5` file is crucial for understanding the available criteria and their expected data types and scales (boolean, number, 1-10 score, string, array).
 
+## Tom Select Integration
+
+We've replaced the custom dropdown implementation with Tom Select (v2.3.1) to improve UX and accessibility. Key integration points:
+
+* Added CDN links to Tom Select CSS and JS in `index.html`
+* Modified `renderValueControl()` to create Tom Select elements
+* Updated `populateSelectOptions()` to initialize Tom Select after adding options
+* Added custom styles in `styles.css` to match our design
+
+Tom Select provides:
+* Searchable dropdowns
+* Clear selection button
+* Better keyboard navigation
+* Improved accessibility
+
+## Filter Logic Enhancements
+
+The filtering mechanism in `script.js` has been enhanced to support dynamic attribute-specific filters, including the newly added "based_on" filter.
+
+*   **Dynamic Filter Application**: The `filterDistros()` method now iterates through all rendered filter attributes, retrieves their selected values (from range inputs, boolean switches, or Tom Select dropdowns), and applies the corresponding filtering logic to the `currentList` of distributions.
+*   **Boolean Filter Handling**: For boolean attributes, the filter is applied only if the custom UI switch is in the "on" state (representing `true`).
+*   **Number/Scale Filter Handling**: For number and scale attributes, filtering is applied if the associated priority button is set to "Important" or "Non-negotiable", ensuring that distributions meet or exceed the selected numerical value.
+*   **Array/String Filter Handling**: For array and string attributes (like "based_on" or "desktop_environments"), the Tom Select dropdown's selected values are used to filter distributions, ensuring that at least one of the selected options is present in the distribution's corresponding attribute.
+*   **Active Filter Badges**: The `updateActiveFilters()` method has been extended to display badges for all active attribute-specific filters, providing clear visual feedback to the user about the applied criteria.
+
 ## Core Logic (`script.js`)
 
 The main functionality of the interactive table is handled by the `DistroComparator` class in `script.js`. Key aspects of the logic include:
@@ -76,3 +101,9 @@ graph TD
 *   The `DistroComparator` class can display a Details Modal in `index.html` with more information.
 
 This diagram provides a high-level overview of how the different parts of the application work together.
+
+## Recommendation Engine
+
+A detailed plan for the Recommendation Engine implementation has been created. This engine will calculate a weighted score for each distribution based on user-defined filter priorities ("Nice-to-Have" and "Important") and the degree to which a distribution matches the selected criteria values. Distributions that do not meet "Non-negotiable" criteria will be excluded.
+
+The detailed plan can be found in [`docs/RecommendationEnginePlan.md`](docs/RecommendationEnginePlan.md). This section will be updated with implementation details once the engine is built.

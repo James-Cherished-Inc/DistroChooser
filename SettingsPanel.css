@@ -1,0 +1,225 @@
+/* Settings Panel Styles */
+.settings-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  display: flex;
+  justify-content: flex-end; /* Align panel to the right */
+  align-items: flex-start; /* Align panel to the top */
+  z-index: 1000; /* Ensure it's above other content */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Add a class when the panel is visible */
+.settings-panel-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-panel-content {
+  background-color: var(--background-color, #fff); /* Use theme variable or default */
+  color: var(--text-color, #333); /* Use theme variable or default */
+  padding: 25px;
+  border-radius: 8px 0 0 8px; /* Rounded corners on the left */
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+  width: 90%; /* Responsive width */
+  max-width: 450px; /* Max width */
+  height: 100%; /* Full height */
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  position: relative;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.settings-panel-overlay.visible .settings-panel-content {
+  transform: translateX(0);
+}
+
+.settings-panel-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--primary-color, #4CAF50); /* Use theme variable or default */
+  border-bottom: 1px solid var(--border-color, #eee);
+  padding-bottom: 10px;
+}
+
+.settings-section {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color-light, #f0f0f0);
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 0.95em;
+}
+
+.settings-section input[type="text"],
+.settings-section input[type="password"] {
+  width: calc(100% - 22px); /* Account for padding */
+  padding: 10px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 4px;
+  background-color: var(--input-background, #fff);
+  color: var(--input-text-color, #333);
+  margin-bottom: 10px;
+}
+
+.settings-section button {
+  padding: 8px 15px;
+  background-color: var(--primary-color, #4CAF50);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9em;
+}
+
+.settings-section button:hover {
+  background-color: var(--primary-color-dark, #45a049);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  color: var(--text-color-light, #aaa);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--text-color, #333);
+}
+
+/* Animated Links */
+.animated-link {
+  display: inline-block;
+  color: var(--link-color, #007bff);
+  text-decoration: none;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.animated-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 5px;
+  left: 0;
+  background-color: var(--link-color, #007bff);
+  transition: width 0.3s ease;
+}
+
+.animated-link:hover {
+  color: var(--link-hover-color, #0056b3);
+}
+
+.animated-link:hover::after {
+  width: 100%;
+}
+
+/* Specific link styling */
+.support-link {
+  color: var(--accent-color-1, #ff69b4); /* Example pink */
+}
+.support-link::after {
+  background-color: var(--accent-color-1, #ff69b4);
+}
+.support-link:hover {
+  color: var(--accent-color-1-dark, #f060a8);
+}
+
+.about-link {
+  color: var(--accent-color-2, #17a2b8); /* Example cyan */
+}
+.about-link::after {
+  background-color: var(--accent-color-2, #17a2b8);
+}
+.about-link:hover {
+  color: var(--accent-color-2-dark, #138496);
+}
+
+
+/* User Guide Section */
+.user-guide-section h3 {
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.user-guide-content {
+  max-height: 40vh; /* Limit height */
+  overflow-y: auto; /* Allow scrolling */
+  border: 1px solid var(--border-color-light, #f0f0f0);
+  padding: 15px;
+  border-radius: 4px;
+  background-color: var(--background-color-light, #f9f9f9);
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+/* Style markdown elements if using react-markdown */
+.user-guide-content h1,
+.user-guide-content h2,
+.user-guide-content h3,
+.user-guide-content h4 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: var(--primary-color, #4CAF50);
+}
+
+.user-guide-content p {
+  margin-bottom: 1em;
+}
+
+.user-guide-content code {
+  background-color: var(--code-background, #e8e8e8);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.user-guide-content pre {
+  background-color: var(--code-background, #e8e8e8);
+  padding: 1em;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.user-guide-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.user-guide-content ul,
+.user-guide-content ol {
+  margin-left: 2em;
+  margin-bottom: 1em;
+}
+
+.user-guide-content blockquote {
+  border-left: 4px solid var(--border-color, #ccc);
+  padding-left: 1em;
+  margin-left: 0;
+  color: var(--text-color-light, #666);
+}
