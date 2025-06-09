@@ -50,7 +50,7 @@ The project aims to provide a comprehensive tool for users to choose a Linux dis
 ### Phase 3: Advanced Features
 - [x] Implement priority sliders for filter controls
 - [ ] Export/import functionality
-- [ ] Recommendation engine
+- [x] Recommendation engine
 - [ ] Accessibility features
 - [ ] Performance optimizations
 - [ ] Improve mobile responsiveness

@@ -4,7 +4,7 @@ class DistroComparator {
     this.filteredDistros = [];
     this.eliminatedDistros = new Set();
     this.currentFilters = {
-      nonNegotiable: true,
+      nonNegotiable: false,
       important: false,
       niceToHave: false,
       search: '',
@@ -247,7 +247,8 @@ class DistroComparator {
         controlElement.id = `${attributeName}-value`;
         controlElement.min = '0'; // Placeholder, will need dynamic min/max later
         controlElement.max = '100'; // Placeholder
-        controlElement.value = '50'; // Default value
+        // Set neutral default to minimum value for number attributes
+        controlElement.value = '0'; // Neutral minimum
         controlElement.classList.add('control-number');
         break;
       case 'scale':
@@ -256,7 +257,8 @@ class DistroComparator {
         controlElement.id = `${attributeName}-value`;
         controlElement.min = '1';
         controlElement.max = '10';
-        controlElement.value = '5';
+        // Set neutral default to middle value for scale attributes
+        controlElement.value = '5'; // Neutral middle, but consider adjusting based on range if needed
         controlElement.classList.add('control-scale');
         break;
       case 'boolean':
@@ -266,7 +268,8 @@ class DistroComparator {
           switchContainer.id = `${attributeName}-value`;
           switchContainer.dataset.attribute = attributeName;
           // Set initial state based on attributeValue
-          if (attributeValue) {
+          // Set neutral default to false for boolean attributes
+          if (false) {
               switchContainer.classList.add('on');
           }
           switchContainer.addEventListener('click', () => {
@@ -494,6 +497,62 @@ class DistroComparator {
   }
 
   // Filter distributions based on criteria
+/**
+   * Calculate the recommendation score for a distro based on user filters and priorities.
+   * This score is a weighted match of 'Nice-to-Have' and 'Important' criteria, as per the recommendation engine plan.
+   */
+  calculateRecommendationScore(distro) {
+    let recommendationScore = 0;
+    let maxPossibleScore = 0;
+    const importantWeight = 2; // Weight for 'Important' criteria
+    const niceToHaveWeight = 1; // Weight for 'Nice-to-Have' criteria
+
+    for (const attributeName in this.filterTemplate) {
+      if (["name", "description", "website"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
+        continue; // Skip non-filter attributes
+      }
+      const attrDiv = document.querySelector(`.filter-attribute[data-attribute="${attributeName}"]`);
+      if (attrDiv) {
+        const activePriorityButton = attrDiv.querySelector('.priority-button.active');
+        if (activePriorityButton) {
+          const priorityLabel = activePriorityButton.textContent.trim();
+          if (priorityLabel === "Don't care") { // Remove 'Non-negotiable' from skip condition to apply filtering
+            continue; // Skip attributes with 'Don't care' or 'Non-negotiable' priority
+          }
+          let filterValue = this.currentFilters.attributeFilters[attributeName];
+          const attributeType = attrDiv.dataset.type;
+          const distroValue = distro[attributeName];
+          let attributeMatchScore = 0;
+          if (attributeType === 'boolean') {
+            if (filterValue === true && distroValue === true) attributeMatchScore = 1;
+            else attributeMatchScore = 0;
+          } else if (attributeType === 'number' || attributeType === 'scale') {
+            if (distroValue >= filterValue) attributeMatchScore = 1;
+            else attributeMatchScore = 0;
+          } else if (attributeType === 'array' || attributeType === 'string') {
+            if (Array.isArray(filterValue) && Array.isArray(distroValue)) {
+              const matchCount = filterValue.filter(val => distroValue.includes(val)).length;
+              attributeMatchScore = filterValue.length > 0 ? matchCount / filterValue.length : 0;
+            } else {
+              attributeMatchScore = 0;
+            }
+          } else {
+            attributeMatchScore = 0; // Unknown type, no match
+          }
+          let priorityWeight = 0;
+          if (priorityLabel === 'Nice to have') priorityWeight = niceToHaveWeight;
+          else if (priorityLabel === 'Important') priorityWeight = importantWeight;
+          recommendationScore += attributeMatchScore * priorityWeight;
+          maxPossibleScore += 1 * priorityWeight; // Max possible score for normalization
+        }
+      }
+    }
+    if (maxPossibleScore > 0) {
+      return (recommendationScore / maxPossibleScore) * 100; // Normalize to 0-100 scale
+    } else {
+      return 0; // No criteria to score, return 0
+    }
+  }
   filterDistros() {
     // Ensure allDistros is populated before proceeding
     if (!this.allDistros || this.allDistros.length === 0) {
@@ -567,6 +626,11 @@ class DistroComparator {
 
     this.filteredDistros = currentList;
 
+    // Calculate recommendation scores for the remaining distros
+    this.filteredDistros.forEach(distro => {
+        distro.recommendationScore = this.calculateRecommendationScore(distro);
+    });
+
     // Apply sorting
     this.sortDistros();
 
@@ -583,7 +647,7 @@ class DistroComparator {
   sortDistros() {
     const sortBy = this.currentFilters.sortBy;
     // Predefined scores for specific sort keys that use the calculateScores method
-    const scoreBasedSortKeys = ['overall', 'nonNegotiable', 'important', 'niceToHave'];
+    const scoreBasedSortKeys = ['overall', 'nonNegotiable', 'important', 'niceToHave', 'recommendationScore'];
 
     this.filteredDistros.sort((a, b) => {
       if (scoreBasedSortKeys.includes(sortBy)) {
@@ -760,7 +824,11 @@ class DistroComparator {
             eliminateBtn.className = 'eliminate-btn';
             eliminateBtn.addEventListener('click', () => this.eliminateDistro(distro.name));
             td.appendChild(eliminateBtn);
-          } else {
+          } else if (key === 'recommendationScore') {
+            // Display recommendation score, rounded to 2 decimal places
+            td.textContent = distro.recommendationScore != null ? distro.recommendationScore.toFixed(2) : '';
+          }
+          else {
             const value = distro[key];
             if (Array.isArray(value)) {
               td.textContent = value.join(', ');

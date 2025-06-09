@@ -57,6 +57,20 @@ The filtering mechanism in `script.js` has been enhanced to support dynamic attr
 *   **Array/String Filter Handling**: For array and string attributes (like "based_on" or "desktop_environments"), the Tom Select dropdown's selected values are used to filter distributions, ensuring that at least one of the selected options is present in the distribution's corresponding attribute.
 *   **Active Filter Badges**: The `updateActiveFilters()` method has been extended to display badges for all active attribute-specific filters, providing clear visual feedback to the user about the applied criteria.
 
+## Recommendation Scoring Algorithm
+The Recommendation Engine calculates a score for each distribution based on how well it matches the user's "Nice-to-Have" and "Important" criteria. The algorithm:
+
+1. For each filter attribute:
+   - Skips "Don't Care" and "Non-negotiable" priorities
+   - For "Nice-to-Have" and "Important":
+     * Calculates attribute match score (0-1) based on data type
+     * Applies priority weight (Nice-to-Have=1, Important=2)
+     * Adds weighted score to total
+2. Normalizes total score to 0-100 range
+3. Stores score as `distro.recommendationScore`
+
+The scores are used to sort distributions, with higher scores appearing first.
+
 ## Core Logic (`script.js`)
 
 The main functionality of the interactive table is handled by the `DistroComparator` class in `script.js`. Key aspects of the logic include:
