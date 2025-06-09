@@ -99,3 +99,16 @@ The filter controls now feature interactive sliders for each setting, providing 
 ### Files Modified:
 - [`script.js`](script.js)
 - [`index.html`](index.html)
+
+---
+
+## 09/06/2025, 01:18:01 pm (Europe/Madrid)
+* Implemented detailed filter badges and removed debug logs.
+
+### Details:
+- Modified the `updateActiveFilters` function in `script.js` to display badges for detailed filters that have been assigned a priority value other than "Don't care".
+- Removed all `console.log`, `console.error`, and `console.warn` statements from `script.js`.
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)

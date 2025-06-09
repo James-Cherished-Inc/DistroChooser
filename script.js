@@ -23,11 +23,11 @@ class DistroComparator {
       // In a real application, consider using a JSON5 parser library
       const text = await response.text();
       this.filterTemplate = JSON5.parse(text); // Use JSON5.parse for JSON5 format
-      console.log('Filter template loaded:', this.filterTemplate);
-      console.log('loadFilterTemplate() called');
+      
+      
     } catch (error) {
-      console.error('Error loading filter template:', error);
-      console.error('Filter template parsing error:', error); // Log the specific error object
+      
+       // Log the specific error object
       // Optionally display an error message to the user
     }
   }
@@ -35,15 +35,15 @@ class DistroComparator {
   // Dynamically render filter controls based on the loaded template
   renderFilterControls() {
     if (!this.filterTemplate) {
-      console.error('Filter template not loaded.');
+      
       return;
     }
-    console.log('renderFilterControls() called');
+    
 
     const detailedFiltersContainer = document.getElementById('detailed-filters');
-    console.log('renderFilterControls: detailedFiltersContainer:', detailedFiltersContainer);
+    
     if (!detailedFiltersContainer) {
-        console.error('renderFilterControls: detailed-filters container NOT FOUND. Aborting filter rendering.');
+        
         return;
     }
 
@@ -51,14 +51,14 @@ class DistroComparator {
     // It's important this doesn't clear the category H3 titles themselves.
     // The .filter-placeholder divs are siblings to the H3s within .filter-category.
     detailedFiltersContainer.querySelectorAll('.filter-placeholder').forEach((placeholder, index) => {
-        console.log(`renderFilterControls: Clearing placeholder ${index}:`, placeholder);
+        
         placeholder.innerHTML = '';
     });
 
 
     // Iterate through the template and create filter controls
     for (const attributeName in this.filterTemplate) {
-        console.log(`renderFilterControls: Processing attribute from template: ${attributeName}`);
+        
         // Skip attributes that are not meant to be filters or are additional features
         if (["name", "description", "website", "based_on"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
             continue;
@@ -122,19 +122,19 @@ class DistroComparator {
             categoryPlaceholderId = 'maintenance-filters';
         } else {
             // If an attribute doesn't match any known category, skip it for now
-            console.warn(`Attribute "${attributeName}" not mapped to a category.`);
+            
             continue;
         }
 
 
         const categoryPlaceholder = document.getElementById(categoryPlaceholderId);
-        console.log(`renderFilterControls: Attempting to find categoryPlaceholder with ID: ${categoryPlaceholderId}`, categoryPlaceholder);
+        
 
         if (!categoryPlaceholder) {
-            console.warn(`Category placeholder "${categoryPlaceholderId}" not found. Skipping attribute: ${attributeName}`);
+            
             continue;
         }
-        console.log(`renderFilterControls: Found categoryPlaceholder "${categoryPlaceholderId}":`, categoryPlaceholder.outerHTML);
+        
 
         const attributeDiv = document.createElement('div');
         attributeDiv.classList.add('filter-attribute');
@@ -218,13 +218,13 @@ class DistroComparator {
                  });
             }
         }
-      console.log(`renderFilterControls: Processing attribute: ${attributeName}, type: ${attributeType}`);
-      console.log(`renderFilterControls: attributeDiv outerHTML before appending:`, attributeDiv.outerHTML);
+      
+      
         // Append the attributeDiv to the categoryPlaceholder
         categoryPlaceholder.appendChild(attributeDiv);
-        console.log(`renderFilterControls: Appended ${attributeName} to ${categoryPlaceholderId}. Current categoryPlaceholder.innerHTML:`, categoryPlaceholder.innerHTML);
+        
     }
-    console.log('renderFilterControls: Finished processing all attributes.');
+    
 }
 
 
@@ -368,14 +368,14 @@ class DistroComparator {
         fetch(`data/distros/perplexity-verified/${file}`).then(res => res.json())
       );
      
-     console.log('loadDistrosFromJSON: distroPromises created.');
+     
 
      this.allDistros = await Promise.all(distroPromises);
-     console.log('loadDistrosFromJSON: Promise.all resolved. Data assigned to this.allDistros.');
-     console.log('Distros loaded:', this.allDistros);
-     console.log('loadDistrosFromJSON() called');
+     
+     
+     
    } catch (error) {
-     console.error('Error loading distributions:', error);
+     
       // Optionally display an error message to the user
     }
   }
@@ -442,21 +442,21 @@ class DistroComparator {
 
   // Filter distributions based on criteria
   filterDistros() {
-    console.log('filterDistros() called');
+    
 
     // Ensure allDistros is populated before proceeding
     if (!this.allDistros || this.allDistros.length === 0) {
-      console.log('filterDistros: allDistros is empty, skipping filtering and rendering.');
+      
       return; // Exit the function if data is not ready
     }
 
     // Start with all distros
     let currentList = [...this.allDistros];
-    console.log('Initial list before elimination filter:', currentList.length);
+    
 
     // Filter out eliminated distros
     currentList = currentList.filter(distro => !this.eliminatedDistros.has(distro.name));
-    console.log('List count after elimination filter:', currentList.length);
+    
 
     // Apply priority summary filters based on selected checkboxes
     if (this.currentFilters.nonNegotiable) {
@@ -473,7 +473,7 @@ class DistroComparator {
     this.sortDistros();
     
     this.filteredDistros = currentList;
-    console.log('Initial filteredDistros count (after elimination):', this.filteredDistros.length);
+    
 
     // NOTE: static summary filters applied above; dynamic attribute filters can be added here
 
@@ -481,14 +481,14 @@ class DistroComparator {
     // ... sorting logic ...
 
     // Render the table with filtered and sorted data
-    console.log('Calling renderTable()');
+    
     this.renderTable();
-    console.log('renderTable() called');
+    
 
     // Update the displayed count
-    console.log('Calling updateDistroCount()');
+    
     this.updateStats();
-    console.log('updateStats() called');
+    
   }
 
   // Sort distributions based on criteria
@@ -536,7 +536,7 @@ class DistroComparator {
   renderTable() {
     const tableContainer = document.getElementById('table-container');
     if (!tableContainer) {
-      console.error('Table container not found');
+      
       return;
     }
 
@@ -752,7 +752,7 @@ class DistroComparator {
 
   // Eliminate distribution from comparison
   eliminateDistro(distroName) {
-    console.log(`eliminateDistro: Called for ${distroName}`); // ADD THIS LINE
+     // ADD THIS LINE
     this.eliminatedDistros.add(distroName);
     this.filterDistros();
     this.showNotification(`${distroName} eliminated from comparison`);
@@ -760,23 +760,23 @@ class DistroComparator {
 
   // Show detailed information modal
   showDetails(distroName) {
-    console.log(`showDetails: Called with distroName: "${distroName}"`);
+    
     const distro = this.allDistros.find(d => d.name === distroName);
-    console.log('showDetails: Found distro object:', distro);
+    
 
     if (!distro) {
-      console.error(`showDetails: Distro "${distroName}" not found in allDistros.`);
+      
       this.showNotification(`Error: Could not find details for ${distroName}.`);
       return;
     }
 
     const modal = document.getElementById('detailsModal');
     const content = document.getElementById('modalContent');
-    console.log('showDetails: Modal element retrieved:', modal);
-    console.log('showDetails: Content element retrieved:', content);
+    
+    
 
     if (!modal || !content) {
-        console.error('showDetails: Modal or modal content element not found in DOM. Aborting.');
+        
         return;
     }
 
@@ -784,7 +784,7 @@ class DistroComparator {
     // Add an "X" close button, styled inline for now, with purple color
     let detailsHtml = `<span class="close-button modal-x-close" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; line-height: 1; color: purple;">&times;</span>`;
     detailsHtml += `<h2>${distro.name || 'N/A'}</h2><div class="distro-details-content">`;
-    console.log('showDetails: Initial detailsHtml with title and X button set.');
+    
 
     try {
         // Iterate over all keys from the distro object for simplicity.
@@ -805,12 +805,12 @@ class DistroComparator {
             }
         }
         detailsHtml += `</div><button class="close-button">Close</button>`;
-        console.log('showDetails: Generated detailsHtml. Length:', detailsHtml.length);
+        
         content.innerHTML = detailsHtml;
-        console.log('showDetails: detailsHtml injected into modalContent.');
+        
 
     } catch (error) {
-        console.error('showDetails: Error constructing details HTML:', error);
+        
         content.innerHTML = `<p>Error displaying details for ${distro.name || 'Unknown Distro'}.</p><button class="close-button">Close</button>`;
     }
 
@@ -839,27 +839,27 @@ class DistroComparator {
     content.style.overflowY = 'auto';
     
 
-    console.log('showDetails: Modal display style set to "block" and other styles applied. Modal should be visible.');
-    console.log('showDetails: Modal computed style display:', window.getComputedStyle(modal).display);
-    console.log('showDetails: Modal computed style visibility:', window.getComputedStyle(modal).visibility);
-    console.log('showDetails: Modal computed style opacity:', window.getComputedStyle(modal).opacity);
+    
+    
+    
+    
 
 
     // Close modal when clicking outside or on close button.
     // Using .onclick to ensure only one handler is attached, overwriting previous if any.
     modal.onclick = (event) => {
-        console.log('showDetails: Modal onclick handler triggered. Event target:', event.target);
+        
         if (event.target === modal || event.target.classList.contains('close-button')) {
-            console.log('showDetails: Closing modal via onclick.');
+            
             modal.style.display = 'none';
         }
     };
-    console.log('showDetails: Modal onclick handler set.');
+    
   }
 
   // Show a simple notification (can be enhanced later)
   showNotification(message) {
-    console.log(`Notification: ${message}`);
+    
     // For a more user-friendly notification, you might want to create a temporary element on the page
     // or use a library. For now, a console log will suffice for debugging.
     // Example of a simple on-page notification:
@@ -896,29 +896,24 @@ class DistroComparator {
       }
   }
 
-  // Display active priority filter badges
+  // Display active detailed filter badges (show only those with priority other than "Don't care")
   updateActiveFilters() {
       const container = document.querySelector('.active-filters');
       if (!container) return;
       container.innerHTML = '';
-      if (this.currentFilters.nonNegotiable) {
+      // Iterate through each detailed filter attribute element
+      document.querySelectorAll('.filter-attribute').forEach(attrDiv => {
+          const attributeName = attrDiv.dataset.attribute;
+          const formattedAttr = attributeName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const activeBtn = attrDiv.querySelector('.priority-button.active');
+          if (!activeBtn) return;
+          const priorityLabel = activeBtn.textContent.trim();
+          if (priorityLabel === "Don't care") return;
           const badge = document.createElement('span');
-          badge.className = 'filter-badge non-negotiable';
-          badge.textContent = 'Non-Negotiable';
+          badge.className = 'filter-badge attribute-badge';
+          badge.textContent = `${formattedAttr}: ${priorityLabel}`;
           container.appendChild(badge);
-      }
-      if (this.currentFilters.important) {
-          const badge = document.createElement('span');
-          badge.className = 'filter-badge important';
-          badge.textContent = 'Important';
-          container.appendChild(badge);
-      }
-      if (this.currentFilters.niceToHave) {
-          const badge = document.createElement('span');
-          badge.className = 'filter-badge nice-to-have';
-          badge.textContent = 'Nice-To-Have';
-          container.appendChild(badge);
-      }
+      });
   }
 }
 
