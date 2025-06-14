@@ -92,30 +92,23 @@ class DistroComparator {
             continue; // Skip unknown types
         }
 
-        // Determine the category placeholder based on attribute name (this needs refinement based on your template structure)
-        // For now, a simple mapping based on the provided index.html structure
+        // Determine the category placeholder based on attribute name and the new category structure
         let categoryPlaceholderId;
-        if (['based_on'].includes(attributeName)) {
+        if (['based_on', 'cost'].includes(attributeName)) {
             categoryPlaceholderId = 'general-info-filters';
         } else if (['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'].includes(attributeName)) {
             categoryPlaceholderId = 'system-requirements-filters';
-        } else if (['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_reliance', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'].includes(attributeName)) {
-            categoryPlaceholderId = 'non-negotiable-criteria-filters';
-        } else if (['free_software_ideology', 'proprietary_software_required', 'sysadmin', 'sysadmin_vulnerability', 'illegal'].includes(attributeName)) {
-            categoryPlaceholderId = 'important-criteria-filters';
-        } else if (['security_vulnerability', 'active_community'].includes(attributeName)) {
-            categoryPlaceholderId = 'nice-to-have-criteria-filters';
         } else if (['ram_usage_idle', 'disk_space_installed', 'iso_size', 'boot_time', 'package_manager', 'desktop_environments', 'default_desktop', 'init_system', 'kernel', 'release_model', 'release_cycle_months', 'support_duration_years', 'update_frequency'].includes(attributeName)) {
             categoryPlaceholderId = 'detailed-specifications-filters';
-        } else if (['privacy_rating', 'security_rating', 'firewall_default', 'firewall', 'encryption_support', 'selinux_apparmor', 'automatic_updates'].includes(attributeName)) {
+        } else if (['secure_boot', 'boot_level_vulnerability', 'telemetry', 'sysadmin_vulnerability', 'illegal', 'privacy_rating', 'security_rating', 'firewall_default', 'firewall', 'encryption_support', 'selinux_apparmor', 'automatic_updates', 'security_vulnerability'].includes(attributeName)) {
             categoryPlaceholderId = 'security-privacy-filters';
-        } else if (['wifi', 'bluetooth', 'touchscreen', 'hidpi', 'arm_', 'raspberry'].includes(attributeName)) {
+        } else if (['nvidia_support', 'wifi', 'bluetooth', 'touchscreen', 'hidpi', 'arm_', 'raspberry'].includes(attributeName)) {
             categoryPlaceholderId = 'hardware-compatibility-filters';
-        } else if (['cpu_usage_idle', 'disk_io_performance', 'network_performance', 'gaming_performance'].includes(attributeName)) {
+        } else if (['responsive', 'resource_efficient', 'power_efficient', 'lightweight', 'cpu_usage_idle', 'disk_io_performance', 'network_performance', 'gaming_performance'].includes(attributeName)) {
             categoryPlaceholderId = 'performance-metrics-filters';
-        } else if (['beginner_friendliness', 'installer_difficulty', 'post_install_setup', 'gui_tools_availability', 'software_center_quality'].includes(attributeName)) {
+        } else if (['gui_customization', 'terminal_reliance', 'app_compatibility', 'beginner_friendliness', 'installer_difficulty', 'post_install_setup', 'gui_tools_availability', 'software_center_quality'].includes(attributeName)) {
             categoryPlaceholderId = 'usability-filters';
-        } else if (['development_tools', 'programming_languages_included', 'container_support', 'virtualization_support', 'server_suitability', 'enterprise_features'].includes(attributeName)) {
+        } else if (['sysadmin', 'development_tools', 'programming_languages_included', 'container_support', 'virtualization_support', 'server_suitability', 'enterprise_features'].includes(attributeName)) {
             categoryPlaceholderId = 'development-professional-use-filters';
         } else if (['multimedia_codecs', 'audio_quality', 'video_editing_support', 'graphics_design_tools'].includes(attributeName)) {
             categoryPlaceholderId = 'multimedia-creativity-filters';
@@ -123,15 +116,15 @@ class DistroComparator {
             categoryPlaceholderId = 'accessibility-filters';
         } else if (['languages_supported', 'rtl_language_support', 'regional_variants'].includes(attributeName)) {
             categoryPlaceholderId = 'localization-filters';
-        } else if (['forum_activity', 'github_activity', 'commercial_support', 'third_party_repositories', 'flatpak_support', 'snap_support', 'appimage_support'].includes(attributeName)) {
+        } else if (['documentation_quality', 'active_community', 'forum_activity', 'github_activity', 'commercial_support', 'third_party_repositories', 'flatpak_support', 'snap_support', 'appimage_support'].includes(attributeName)) {
             categoryPlaceholderId = 'community-ecosystem-filters';
-        } else if (['live_usb_support', 'persistence_support', 'snapshot_rollback', 'immutable_system', 'unique_features', 'target_audience'].includes(attributeName)) {
+        } else if (['free_software_ideology', 'proprietary_software_required', 'live_usb_support', 'persistence_support', 'snapshot_rollback', 'immutable_system', 'unique_features', 'target_audience'].includes(attributeName)) {
             categoryPlaceholderId = 'special-features-filters';
-        } else if (['manual_intervention_frequency', 'breaking_changes_frequency', 'long_term_stability', 'backup_tools_included'].includes(attributeName)) {
+        } else if (['stability', 'updates', 'manual_intervention_frequency', 'breaking_changes_frequency', 'long_term_stability', 'backup_tools_included'].includes(attributeName)) {
             categoryPlaceholderId = 'maintenance-filters';
         } else {
             // If an attribute doesn't match any known category, skip it for now
-            
+
             continue;
         }
 
@@ -1240,7 +1233,8 @@ document.getElementById('scroll-to-top').addEventListener('click', () => {
 document.getElementById('scroll-to-bottom').addEventListener('click', () => {
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 });
-// Removed duplicate event listeners to fix errors and prevent null reference issues.
+
+
    });
  
    // Add event listener to clear state on page unload

@@ -1,10 +1,13 @@
+### The filters about a Distro's minimum requirements should work as maximums. Ram and Disk Requirements. Same for CPU cores and CPU requirements. The user should see a filter that allows him to choose a maximum and filter distros that ask a minimum higher than the value set. Ok? What I suggest is to change the single-dot slider to a two-dot sliders that allows to select a range, wdyt, and maybe probably for all the slider filters? Is it feasible or too complex?
+For example for the Terminal Reliance, users currently do not understand if they need to choose a minimum, a maximum, or an exact value. It'd make more sense for them to be able to choose a range.
 
-### Make the Top and Bottom buttons wider elipses instead of small circle. Make them more beautiful, slightly more discrete.
-If technically feasible, they'd ideally be shown only when the user is scrolling. Is it feasible?
+### 
 
 ### UI Improvements : add a modern feel and colorful borders to the big divs and sections, please. Make the slider for the detailed filter controls purple instead of red.
 
 # Useful
+
+## Allow users to add one of the 56 distros from the list as a new row by typing the name, just on top of the table. This allows to add a distro that's been filtered out, to compare it with the displayed results
 
 ## Can we increase the width of the "Description" column in the table please?
 

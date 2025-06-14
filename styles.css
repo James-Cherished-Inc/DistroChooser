@@ -644,21 +644,31 @@ input.control-number::-moz-range-track {
     opacity: 0.8; /* Slight fade for hover effect */
 }
 /* Styles for scroll arrows */
+/* Scroll buttons container */
 #scroll-arrows {
   position: fixed;
-  bottom: 20px;
   right: 20px;
+  bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  z-index: 1000;
+  gap: 12px;
+  z-index: 999;
+  opacity: 0.3; /* Visible with transparency */
+  transition: opacity 0.3s ease;
+}
+
+/* Show fully on hover */
+#scroll-arrows:hover {
+  opacity: 1;
 }
 
 #scroll-arrows button {
-  width: 50px;
+  /* Increased width for better visibility and user preference */
+  width: 70px; /* Adjusted from 50px to 70px to make buttons wider */
   height: 50px;
   border: none;
-  border-radius: 50%;
+  /* Changed to elongated ellipse for better UI aesthetics as per user request */
+  border-radius: 50% / 30%; /* Elliptical shape with vertical elongation */
   background-color: #007bff;
   color: white;
   font-size: 20px;
