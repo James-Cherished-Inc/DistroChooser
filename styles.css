@@ -21,7 +21,7 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 20极px;
     background-color: #f5f7fa;
 }
 
@@ -164,7 +164,7 @@ body {
 }
 
 .category-header.non-negotiable {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135极deg, #ff6b6b 0%, #ee5a24 100%);
 }
 
 .category-header.important {
@@ -242,7 +242,7 @@ body {
 
 .criterion-cell.poor {
   color: #dc3545;
-  background: rgba(220, 53, 69, 0.15);
+  background: rgba(220, 53, 69极, 0.15);
 }
 
 /* Distro info styling */
@@ -339,6 +339,10 @@ body {
     background-color: #f0f0f0;
     border-radius: 4px;
     margin-bottom: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Ensure it's above other scrolling content */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: add a subtle shadow */
 }
 
 #detailed-filters .filters-header h2 {
@@ -447,4 +451,292 @@ body {
 .attribute-badge {
   background-color: #74b9ff;
   color: #fff;
+}
+
+/* Force red accent on all range sliders */
+input.control-scale,
+input.control-number {
+  accent-color: red !important;
+}
+
+/* Premium slider design with gradient effects */
+input.control-scale,
+input.control-number {
+  height: 40px !important; /* Increased height for better visibility */
+  width: 100% !important; /* Full width for better usability */
+  margin: 10px 0 !important;
+}
+
+input.control-scale::-webkit-slider-thumb,
+input.control-number::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #ff4d4d 0%, #cc0000 100%) !important;
+  border: 3px solid white !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,0,0,0.3) !important;
+  cursor: pointer !important;
+  margin-top: -10px !important; /* Adjusted for better alignment */
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+input.control-scale::-webkit-slider-thumb:hover,
+input.control-number::-webkit-slider-thumb:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,0,0,0.3) !important;
+}
+
+input.control-scale::-moz-range-thumb,
+input.control-number::-moz-range-thumb {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #ff4d4d 0%, #cc0000 100%) !important;
+  border: 3px solid white !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,0,0,0.3) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  margin-top: -8px !important;
+}
+
+input.control-scale::-moz-range-thumb:hover,
+input.control-number::-moz-range-thumb:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,0,0,0.3) !important;
+}
+
+/* Gradient track styling */
+input.control-scale::-webkit-slider-runnable-track,
+input.control-number::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #ff9999, #ff3333) !important;
+  height: 14px !important;
+  border-radius: 7px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+input.control-scale::-moz-range-track,
+input.control-number::-moz-range-track {
+  background: linear-gradient(to right, #ff9999, #ff3333) !important;
+  height: 14px !important;
+  border-radius: 7px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* Value display styling */
+.filter-value-display {
+  display: inline-block;
+  min-width: 30px;
+  padding: 4px 8px;
+  background: #ff3333;
+  color: white;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Slider container improvements */
+.attribute-value-control {
+  display: flex;
+  align-items: center;
+  padding: 15px 0 !important;
+  width: 100%;
+}
+
+/* Label styling for better hierarchy */
+.label-container { /* New style for the container of label and help icon */
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px; /* Adjust as needed for spacing */
+  position: relative; /* Establish positioning context for tooltip */
+}
+
+.filter-attribute label {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #333;
+  /* margin-bottom: 8px; Removed as it's now on label-container */
+  display: inline-block; /* Changed to inline-block to sit next to icon */
+  margin-right: 5px; /* Space between label text and icon */
+}
+
+/* Custom Switch Styles */
+.custom-switch {
+     position: relative;
+     display: inline-block;
+     width: 80px; /* Increased width */
+     height: 34px; /* Adjust height as needed */
+     background-color: #007bff; /* Off state background (blue) */
+    border-radius: 34px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    vertical-align: middle; /* Align with label */
+}
+
+.custom-switch.on {
+    background-color: #28a745; /* On state background (Success green) */
+}
+
+.custom-switch .switch-toggle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 26px; /* Adjust size as needed */
+    height: 26px; /* Adjust size as needed */
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.custom-switch.on .switch-toggle {
+    transform: translateX(46px); /* Move toggle to the right (New width - toggle width - padding*2) */
+}
+
+.custom-switch .switch-label {
+    position: absolute;
+    top: 50%;
+    left: 50%; /* Center the label horizontally */
+    transform: translate(-50%, -50%); /* Center the label vertically and horizontally */
+    font-size: 12px; /* Adjust font size */
+    font-weight: bold;
+    color: white; /* Text color */
+    text-align: center;
+    width: 100%; /* Allow label to take full width for centering */
+    pointer-events: none; /* Allow clicks to pass through to the switch */
+    z-index: 1; /* Ensure label is above toggle */
+}
+
+.custom-switch.on .switch-label {
+     /* Label is already centered, no specific adjustment needed for 'True' */
+}
+
+/* deleted because: switch label should remain white in both states */
+/* .custom-switch:not(.on) .switch-label {
+    color: #dc3545;
+} */
+
+.custom-switch:not(.on) {
+    background-color: #007bff !important; /* Off state background (blue) */
+}
+
+/* Tom Select Styles */
+.ts-control {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+}
+/* Additional styling for dropdown states */
+
+/* Style for reset icon in active filters badges */
+.reset-icon {
+    cursor: pointer;
+    margin-left: 5px;
+    color: red; /* Make it red to stand out as a reset action */
+    font-size: 1.2em; /* Slightly larger for better touch targets and visibility */
+    vertical-align: middle; /* Align with the badge text */
+    user-select: none; /* Prevent text selection when clicking */
+}
+.reset-icon:hover {
+    color: darkred; /* Darker shade on hover for visual feedback */
+    opacity: 0.8; /* Slight fade for hover effect */
+}
+/* Styles for scroll arrows */
+#scroll-arrows {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+#scroll-arrows button {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#scroll-arrows button:hover {
+  background-color: #0056b3;
+  transform: scale(1.1);
+}
+
+/* Custom tooltip styles */
+.filter-attribute .help-icon[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 125%; /* Position above the icon */
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  white-space: nowrap; /* Prevent text wrapping */
+  z-index: 100; /* Ensure it's above other elements */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.filter-attribute .help-icon[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 115%; /* Position just below the tooltip text */
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.filter-attribute .help-icon:hover::after,
+.filter-attribute .help-icon:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+#scroll-arrows button:active {
+  transform: scale(0.95);
+}
+/* Help icon styles */
+.filter-attribute .help-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: help;
+  /* margin-left: 5px; Removed as margin-right is on label */
+  transition: background 0.3s ease;
+  position: relative; /* Ensure z-index works */
+  z-index: 10; /* Ensure it's above other elements if any overlap */
+}
+
+.filter-attribute .help-icon:hover {
+  background: #0056b3;
 }

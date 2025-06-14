@@ -56,10 +56,10 @@ To avoid unecessarily long codefiles, we define each slider and value control on
 ## Next Steps (after HTML structure is updated):
 
 *   Implement JavaScript to dynamically render the appropriate value controls based on the `data-type` attribute.
-*   Implement JavaScript to handle the logic for filtering the distribution data based on the selected preference levels and value control inputs.
+*   Implement JavaScript to handle the logic for filtering the distribution data based on the selected preference levels and value control inputs. This logic will now prioritize filtering by detailed attribute values first, and then apply summary filters (Non-Negotiable, Important, Nice-to-Have) based on whether a distribution meets *all* criteria marked with that specific priority level by the user.
 *   Integrate the filter controls with the table display to show only matching distributions.
 
-## Visual Representation (Mermaid Diagram):
+## Visual Representation (Mermaid Diagram - Rendering):
 
 ```mermaid
 graph TD
@@ -77,4 +77,32 @@ graph TD
     K --> L{Present Plan to User};
 ```
 
-This plan provides a structured approach to implementing the filter controls efficiently and maintainably, addressing the feedback provided.
+## Visual Representation (Mermaid Diagram - Filtering Logic):
+
+```mermaid
+graph TD
+    A[Start with All Distros] --> B{Eliminate Manually Hidden Distros};
+    B --> C[Initial Filterable List];
+
+    subgraph Detailed Attribute Filtering
+        C --> D{For each attribute (e.g., Secure Boot, RAM)}
+        D -- User sets value (e.g., Yes, >=8GB) --> E[Apply Value Filter];
+        E --> F[List filtered by detailed values];
+    end
+
+    F --> G{Non-Negotiable Summary Checkbox Checked?};
+    G -- Yes --> H{Filter `valueFilteredList`: Distro must meet ALL criteria user marked "Non-negotiable" with their set values};
+    G -- No --> I[List remains as is];
+    H --> I;
+
+    I --> J{Important Summary Checkbox Checked?};
+    J -- Yes --> K{Filter Current List: Distro must meet ALL criteria user marked "Important" with their set values};
+    J -- No --> L[List remains as is];
+    K --> L;
+
+    L --> M{Nice-to-Have Summary Checkbox Checked?};
+    M -- Yes --> N{Filter Current List: Distro must meet ALL criteria user marked "Nice-to-Have" with their set values};
+    M -- No --> O[List remains as is];
+    N --> O;
+
+    O --> P[Final Filtered List for Display];

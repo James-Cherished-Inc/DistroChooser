@@ -4,7 +4,7 @@ class DistroComparator {
     this.filteredDistros = [];
     this.eliminatedDistros = new Set();
     this.currentFilters = {
-      nonNegotiable: true,
+      nonNegotiable: false,
       important: false,
       niceToHave: false,
       search: '',
@@ -18,17 +18,20 @@ class DistroComparator {
   // Load the filter template from JSON
   async loadFilterTemplate() {
     try {
-      const response = await fetch('data/template.json5');
-      // Assuming json5 is not directly supported by fetch, parse as text and then use JSON.parse
-      // In a real application, consider using a JSON5 parser library
-      const text = await response.text();
-      this.filterTemplate = JSON5.parse(text); // Use JSON5.parse for JSON5 format
+      // Load main template
+      const templateResponse = await fetch('data/template.json5');
+      const templateText = await templateResponse.text();
+      this.filterTemplate = JSON5.parse(templateText);
       
+      // Load descriptions
+      const descResponse = await fetch('data/template_descriptions.json');
+      const descText = await descResponse.text();
+      console.log('Raw descriptions text:', descText); // Added log
+      this.filterDescriptions = JSON.parse(descText).descriptions;
+      console.log('Filter descriptions loaded:', this.filterDescriptions); // Re-added log
       
     } catch (error) {
-      
-       // Log the specific error object
-      // Optionally display an error message to the user
+      console.error('Error loading template or descriptions:', error);
     }
   }
 
@@ -40,10 +43,11 @@ class DistroComparator {
     }
     
 
+    console.time('renderFilterControls'); // Start timer for renderFilterControls
     const detailedFiltersContainer = document.getElementById('detailed-filters');
     
     if (!detailedFiltersContainer) {
-        
+        console.timeEnd('renderFilterControls'); // End timer if container not found
         return;
     }
 
@@ -60,7 +64,7 @@ class DistroComparator {
     for (const attributeName in this.filterTemplate) {
         
         // Skip attributes that are not meant to be filters or are additional features
-        if (["name", "description", "website", "based_on"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
+        if (["name", "description", "website"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
             continue;
         }
 
@@ -88,7 +92,9 @@ class DistroComparator {
         // Determine the category placeholder based on attribute name (this needs refinement based on your template structure)
         // For now, a simple mapping based on the provided index.html structure
         let categoryPlaceholderId;
-        if (['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'].includes(attributeName)) {
+        if (['based_on'].includes(attributeName)) {
+            categoryPlaceholderId = 'general-info-filters';
+        } else if (['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'].includes(attributeName)) {
             categoryPlaceholderId = 'system-requirements-filters';
         } else if (['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_reliance', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'].includes(attributeName)) {
             categoryPlaceholderId = 'non-negotiable-criteria-filters';
@@ -143,14 +149,38 @@ class DistroComparator {
 
         // Create label (convert snake_case to Title Case)
         const labelText = attributeName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const labelContainer = document.createElement('div');
+        labelContainer.className = 'label-container';
+        
         const label = document.createElement('label');
         label.setAttribute('for', `${attributeName}-pref`);
         label.textContent = `${labelText}:`;
-        attributeDiv.appendChild(label);
+        labelContainer.appendChild(label);
+        
+        // Add help icon with description tooltip
+        if (this.filterDescriptions && this.filterDescriptions[attributeName]) {
+          const helpIcon = document.createElement('span');
+          helpIcon.className = 'help-icon';
+          helpIcon.textContent = '?';
+          helpIcon.title = this.filterDescriptions[attributeName]; // Keep for accessibility fallback
+          helpIcon.dataset.tooltip = this.filterDescriptions[attributeName]; // New data attribute for custom tooltip
+          console.log(`Help icon created for ${attributeName}. Title: "${helpIcon.title}", Data-tooltip: "${helpIcon.dataset.tooltip}"`); // Re-added log
+          // Prevent click events on help icon from propagating
+          helpIcon.addEventListener('click', (e) => e.stopPropagation());
+          labelContainer.appendChild(helpIcon);
+          // Log computed style after appending to DOM
+          setTimeout(() => {
+            const computedStyle = window.getComputedStyle(helpIcon);
+            console.log(`Computed style for ${attributeName} help icon: display=${computedStyle.display}, visibility=${computedStyle.visibility}, opacity=${computedStyle.opacity}`); // Re-added log
+          }, 50); // Small delay to ensure rendering
+        }
+        
+        attributeDiv.appendChild(labelContainer);
 
         // Create preference level slider with labels
         const buttonContainer = document.createElement('div');
         buttonContainer.className = 'priority-buttons-container';
+        buttonContainer.style.display = 'block'; // Ensure proper layout
 
         const priorityLabels = ['Not important', 'Don\'t care', 'Nice to have', 'Important', 'Non-negotiable'];
         priorityLabels.forEach((label, index) => {
@@ -167,7 +197,7 @@ class DistroComparator {
                     btn.classList.remove('active');
                 });
                 button.classList.add('active');
-                this.filterDistros();
+                this.debouncedFilterDistros();
             });
             buttonContainer.appendChild(button);
         });
@@ -180,14 +210,18 @@ class DistroComparator {
         attributeDiv.appendChild(valueControlContainer);
 
         // Render the appropriate value control
-        const valueControlElement = this.renderValueControl(attributeName, attributeType);
+        const valueControlElement = this.renderValueControl(attributeName, attributeType, attributeValue);
         valueControlContainer.appendChild(valueControlElement);
 
-        // Create span to display the current value
-        const valueDisplay = document.createElement('span');
-        valueDisplay.classList.add('filter-value-display');
-        valueDisplay.textContent = valueControlElement.value;
-        valueControlContainer.appendChild(valueDisplay);
+        // Create span to display the current value (only for non-boolean types)
+        let valueDisplay; // Declare valueDisplay here
+
+        if (attributeType !== 'boolean') {
+            valueDisplay = document.createElement('span');
+            valueDisplay.classList.add('filter-value-display');
+            valueDisplay.textContent = valueControlElement.value;
+            valueControlContainer.appendChild(valueDisplay);
+        }
 
         // Update the displayed value on input for number and scale types
         if (attributeType === 'number' || attributeType === 'scale') {
@@ -196,25 +230,19 @@ class DistroComparator {
             });
         }
 
-        // Populate select options for array/string types after rendering
-        if (attributeType === 'array' || attributeType === 'string') {
-            this.populateSelectOptions(attributeName);
-        }
-
-
         // Event listener for the value control element
         if (valueControlElement) { // Check if an element was actually created
             if (attributeType === 'boolean') {
                 valueControlElement.addEventListener('change', () => {
-                    this.filterDistros();
+                    this.debouncedFilterDistros();
                 });
             } else if (attributeType === 'number' || attributeType === 'scale') {
                 valueControlElement.addEventListener('input', () => {
-                    this.filterDistros();
+                    this.debouncedFilterDistros();
                 });
             } else if (attributeType === 'array' || attributeType === 'string') {
                  valueControlElement.addEventListener('change', () => {
-                    this.filterDistros();
+                    this.debouncedFilterDistros();
                  });
             }
         }
@@ -222,15 +250,19 @@ class DistroComparator {
       
         // Append the attributeDiv to the categoryPlaceholder
         categoryPlaceholder.appendChild(attributeDiv);
+
+        // Populate select options for array/string types AFTER the element is in the DOM
+        if (attributeType === 'array' || attributeType === 'string') {
+            this.populateSelectOptions(attributeName);
+        }
         
     }
-    
+    console.timeEnd('renderFilterControls'); // End timer for renderFilterControls
 }
 
 
   // Render the appropriate value control based on attribute type
-  // Render the appropriate value control based on attribute type
-  renderValueControl(attributeName, attributeType) {
+  renderValueControl(attributeName, attributeType, attributeValue) {
     let controlElement;
     switch (attributeType) {
       case 'number':
@@ -239,7 +271,9 @@ class DistroComparator {
         controlElement.id = `${attributeName}-value`;
         controlElement.min = '0'; // Placeholder, will need dynamic min/max later
         controlElement.max = '100'; // Placeholder
-        controlElement.value = '50'; // Default value
+        // Set neutral default to minimum value for number attributes
+        controlElement.value = '0'; // Neutral minimum
+        controlElement.classList.add('control-number');
         break;
       case 'scale':
         controlElement = document.createElement('input');
@@ -247,56 +281,98 @@ class DistroComparator {
         controlElement.id = `${attributeName}-value`;
         controlElement.min = '1';
         controlElement.max = '10';
-        controlElement.value = '5';
+        // Set neutral default to middle value for scale attributes
+        controlElement.value = '1'; // Neutral minimum set to 1 as per user requirement for range defaults
+        controlElement.classList.add('control-scale');
         break;
       case 'boolean':
-        controlElement = document.createElement('input');
-        controlElement.type = 'checkbox';
-        controlElement.id = `${attributeName}-value`;
-        break;
+          // Create a custom UI switch for boolean attributes with integrated label and initial state based on attributeValue
+          const switchContainer = document.createElement('div');
+          switchContainer.classList.add('custom-switch');
+          switchContainer.id = `${attributeName}-value`;
+          switchContainer.dataset.attribute = attributeName;
+          // Set initial state based on attributeValue
+          // Set neutral default to false for boolean attributes
+          if (false) {
+              switchContainer.classList.add('on');
+          }
+          switchContainer.addEventListener('click', () => {
+              console.time(`Click handler for ${attributeName}`); // Start timer for click handler
+              switchContainer.classList.toggle('on');
+              const switchLabel = switchContainer.querySelector('.switch-label');
+              if (switchLabel) {
+                  switchLabel.textContent = switchContainer.classList.contains('on') ? 'True' : 'False';
+              }
+              const event = new Event('change');
+              switchContainer.dispatchEvent(event); // Dispatch change event to trigger filterDistros
+              console.timeEnd(`Click handler for ${attributeName}`); // End timer for click handler
+          });
+          // Create toggle element
+          const switchToggle = document.createElement('div');
+          switchToggle.classList.add('switch-toggle');
+          switchContainer.appendChild(switchToggle);
+          // Create label element for True/False state
+          const switchLabel = document.createElement('span');
+          switchLabel.classList.add('switch-label');
+          switchLabel.textContent = attributeValue ? 'True' : 'False'; // Initial text based on attributeValue
+          switchContainer.appendChild(switchLabel);
+          return switchContainer;
       case 'array':
       case 'string':
         controlElement = document.createElement('select');
         controlElement.id = `${attributeName}-value`;
-        controlElement.multiple = true; // For array types, allow multiple selections
+        controlElement.multiple = true; // Allow multiple selections for both array and string types
+        controlElement.dataset.param = attributeName; // Store attribute name for Tom Select
+        controlElement.classList.add('tom-select'); // Add class for Tom Select
+        controlElement.classList.add(`control-${attributeType}`);
         break;
       default:
         controlElement = document.createElement('div'); // Return an empty div for unknown/skipped types
         break;
     }
+    // Add a class for styling based on control type
+    controlElement.classList.add(`control-${attributeType}`);
     return controlElement;
   }
 
   // Populate select options for array and string attributes
   populateSelectOptions(attributeName) {
-      const selectElement = document.getElementById(`${attributeName}-value`);
-      if (!selectElement || !this.allDistros || this.allDistros.length === 0) return;
+      const select = document.getElementById(`${attributeName}-value`);
+      if (!select) {
+        return;
+      }
+      if (!this.allDistros || this.allDistros.length === 0) {
+        return;
+      }
 
       const uniqueValues = new Set();
       this.allDistros.forEach(distro => {
           const value = distro[attributeName];
           if (Array.isArray(value)) {
-              value.forEach(item => uniqueValues.add(item));
+              value.forEach(item => {
+                  if (item !== null && item !== undefined) uniqueValues.add(String(item));
+              });
           } else if (typeof value === 'string') {
               uniqueValues.add(value);
           }
       });
 
       // Clear existing options
-      selectElement.innerHTML = '';
-
-      // Add a default "Select all" or placeholder option if needed
-      // const defaultOption = document.createElement('option');
-      // defaultOption.value = '';
-      // defaultOption.textContent = `Select ${attributeName}`;
-      // selectElement.appendChild(defaultOption);
+      select.innerHTML = '';
 
       // Add unique values as options
       uniqueValues.forEach(value => {
           const option = document.createElement('option');
           option.value = value;
           option.textContent = value;
-          selectElement.appendChild(option);
+          select.appendChild(option);
+      });
+
+      // Initialize Tom Select after adding options
+      new TomSelect(select, {
+        placeholder: 'Select option...',
+        allowEmptyOption: true,
+        plugins: ['clear_button']
       });
   }
 
@@ -367,18 +443,24 @@ class DistroComparator {
       const distroPromises = distroFiles.map(file =>
         fetch(`data/distros/perplexity-verified/${file}`).then(res => res.json())
       );
+     this.allDistros = await Promise.all(distroPromises).then(results => {
+      // console.log('Distro data loaded successfully. Number of distros:', results.length); // Debug log for successful load
+      return results;
+     }).catch(error => {
+      console.error('Error loading distro data:', error);
+      return [];
+     });
      
      
-
-     this.allDistros = await Promise.all(distroPromises);
+     
      
      
      
    } catch (error) {
      
-      // Optionally display an error message to the user
-    }
-  }
+       // Optionally display an error message to the user
+     }
+   }
 
   // Calculate scores for each category
   calculateScores(distro) {
@@ -441,61 +523,172 @@ class DistroComparator {
   }
 
   // Filter distributions based on criteria
-  filterDistros() {
-    
+/**
+   * Calculate the recommendation score for a distro based on user filters and priorities.
+   * This score is a weighted match of 'Nice-to-Have' and 'Important' criteria, as per the recommendation engine plan.
+   */
+  calculateRecommendationScore(distro) {
+    let recommendationScore = 0;
+    let maxPossibleScore = 0;
+    const importantWeight = 2; // Weight for 'Important' criteria
+    const niceToHaveWeight = 1; // Weight for 'Nice-to-Have' criteria
 
-    // Ensure allDistros is populated before proceeding
-    if (!this.allDistros || this.allDistros.length === 0) {
-      
-      return; // Exit the function if data is not ready
+    for (const attributeName in this.filterTemplate) {
+      if (["name", "description", "website"].includes(attributeName) || attributeName.startsWith('//') || attributeName.startsWith('----')) {
+        continue; // Skip non-filter attributes
+      }
+      const attrDiv = document.querySelector(`.filter-attribute[data-attribute="${attributeName}"]`);
+      if (attrDiv) {
+        const activePriorityButton = attrDiv.querySelector('.priority-button.active');
+        if (activePriorityButton) {
+          const priorityLabel = activePriorityButton.textContent.trim();
+          if (priorityLabel === "Don't care") { // Remove 'Non-negotiable' from skip condition to apply filtering
+            continue; // Skip attributes with 'Don't care' or 'Non-negotiable' priority
+          }
+          let filterValue = this.currentFilters.attributeFilters[attributeName];
+          const attributeType = attrDiv.dataset.type;
+          const distroValue = distro[attributeName];
+          let attributeMatchScore = 0;
+          if (attributeType === 'boolean') {
+            if (filterValue === true && distroValue === true) attributeMatchScore = 1;
+            else attributeMatchScore = 0;
+          } else if (attributeType === 'number' || attributeType === 'scale') {
+            if (distroValue >= filterValue) attributeMatchScore = 1;
+            else attributeMatchScore = 0;
+          } else if (attributeType === 'array' || attributeType === 'string') {
+            if (Array.isArray(filterValue) && Array.isArray(distroValue)) {
+              const matchCount = filterValue.filter(val => distroValue.includes(val)).length;
+              attributeMatchScore = filterValue.length > 0 ? matchCount / filterValue.length : 0;
+            } else {
+              attributeMatchScore = 0;
+            }
+          } else {
+            attributeMatchScore = 0; // Unknown type, no match
+          }
+          let priorityWeight = 0;
+          if (priorityLabel === 'Nice to have') priorityWeight = niceToHaveWeight;
+          else if (priorityLabel === 'Important') priorityWeight = importantWeight;
+          recommendationScore += attributeMatchScore * priorityWeight;
+          maxPossibleScore += 1 * priorityWeight; // Max possible score for normalization
+        }
+      }
     }
-
-    // Start with all distros
-    let currentList = [...this.allDistros];
-    
-
-    // Filter out eliminated distros
-    currentList = currentList.filter(distro => !this.eliminatedDistros.has(distro.name));
-    
-
-    // Apply priority summary filters based on selected checkboxes
-    if (this.currentFilters.nonNegotiable) {
-        currentList = currentList.filter(distro => this.calculateScores(distro).nonNegotiable === 100);
+    if (maxPossibleScore > 0) {
+      return (recommendationScore / maxPossibleScore) * 100; // Normalize to 0-100 scale
+    } else {
+      return 0; // No criteria to score, return 0
     }
-    if (this.currentFilters.important) {
-        currentList = currentList.filter(distro => this.calculateScores(distro).important === 100);
-    }
-    if (this.currentFilters.niceToHave) {
-        currentList = currentList.filter(distro => this.calculateScores(distro).niceToHave === 100);
-    }
-
-    // Apply sorting before rendering
-    this.sortDistros();
-    
-    this.filteredDistros = currentList;
-    
-
-    // NOTE: static summary filters applied above; dynamic attribute filters can be added here
-
-    // Apply sorting
-    // ... sorting logic ...
-
-    // Render the table with filtered and sorted data
-    
-    this.renderTable();
-    
-
-    // Update the displayed count
-    
-    this.updateStats();
-    
   }
+  filterDistros() {
+    console.time('filterDistros'); // Start timer for filterDistros
+    // Show loading indicator
+    const tableBody = document.getElementById('distroTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = '<tr><td colspan="20" class="loading-indicator">Filtering distributions...</td></tr>';
+    }
+
+    // Use requestAnimationFrame to prevent blocking UI
+    requestAnimationFrame(() => {
+      // Ensure data is ready
+      if (!this.allDistros || this.allDistros.length === 0) return;
+
+      // Base list minus eliminated distros
+      let list = this.allDistros.filter(d => !this.eliminatedDistros.has(d.name));
+
+      // Reset attribute filter store
+      this.currentFilters.attributeFilters = {};
+
+      // Apply detailed filters (only if corresponding summary checkbox is checked)
+      document.querySelectorAll('.filter-attribute').forEach(attrDiv => {
+        const name = attrDiv.dataset.attribute;
+        const type = attrDiv.dataset.type;
+        // Determine if this attribute's filter should apply based on its priority and summary checkbox
+        const pBtn = attrDiv.querySelector('.priority-button.active');
+        const pVal = pBtn ? parseInt(pBtn.dataset.value, 10) : 1; // Default to "Don't care" if no button active
+        const applyFilter = (pVal === 4 && this.currentFilters.nonNegotiable) ||
+                            (pVal === 3 && this.currentFilters.important) ||
+                            (pVal === 2 && this.currentFilters.niceToHave);
+        let val, active = false; // Initialize active to false
+
+        if (type === 'boolean') {
+          const sw = attrDiv.querySelector('.custom-switch');
+          val = sw.classList.contains('on');
+          active = val; // A boolean filter is active if the switch is 'on'
+          if (applyFilter && active) {
+            list = list.filter(d => d[name] === true);
+          }
+        } else if (type === 'number' || type === 'scale') {
+          const inp = attrDiv.querySelector('input[type="range"]');
+          val = parseInt(inp.value, 10);
+          const def = parseInt(inp.min, 10);
+          active = val > def; // A range filter is active if the value is not the minimum
+          if (applyFilter && active) {
+            list = list.filter(d => typeof d[name] === 'number' && d[name] >= val);
+          }
+        } else { // array or string
+          const sel = attrDiv.querySelector('select.tom-select');
+          val = sel && sel.tomselect ? sel.tomselect.getValue() : [];
+          active = Array.isArray(val) && val.length > 0; // A select filter is active if options are selected
+          if (applyFilter && active) {
+            list = list.filter(d => {
+              const dvd = Array.isArray(d[name]) ? d[name] : [d[name]];
+              // Use 'some' for OR logic when applying filters based on summary checkboxes
+              return Array.isArray(val) && val.some(v => dvd.includes(v));
+            });
+          }
+        }
+
+        this.currentFilters.attributeFilters[name] = val;
+      });
+
+      this.filteredDistros = list;
+      this.filteredDistros.forEach(d => d.recommendationScore = this.calculateRecommendationScore(d));
+      this.sortDistros();
+      this.renderTable();
+      this.updateStats();
+      this.updateActiveFilters();
+      console.timeEnd('filterDistros'); // End timer for filterDistros
+    });
+
+    // Apply summary filters in order: NN (4), Important (3), Nice-to-Have (2)
+    [
+      { key: 'nonNegotiable', level: '4' },
+      { key: 'important', level: '3' },
+      { key: 'niceToHave', level: '2' }
+    ].forEach(({ key, level }) => {
+      if (this.currentFilters[key]) {
+        document.querySelectorAll('.filter-attribute').forEach(attrDiv => {
+          const btn = attrDiv.querySelector('.priority-button.active');
+          if (btn && btn.dataset.value === level) {
+            const name = attrDiv.dataset.attribute;
+            const type = attrDiv.dataset.type;
+            const filterVal = this.currentFilters.attributeFilters[name];
+            if (filterVal == null) return;
+            if (type === 'boolean') {
+              list = list.filter(d => d[name] === true);
+            } else if (type === 'number' || type === 'scale') {
+              list = list.filter(d => typeof d[name] === 'number' && d[name] >= filterVal);
+            } else {
+              list = list.filter(d => {
+                const dvd = Array.isArray(d[name]) ? d[name] : [d[name]];
+                return Array.isArray(filterVal) && filterVal.some(v => dvd.includes(v));
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+
+
+  // Debounce filter to prevent excessive calls
+  debouncedFilterDistros = _.debounce(() => this.filterDistros(), 300);
 
   // Sort distributions based on criteria
   sortDistros() {
     const sortBy = this.currentFilters.sortBy;
     // Predefined scores for specific sort keys that use the calculateScores method
-    const scoreBasedSortKeys = ['overall', 'nonNegotiable', 'important', 'niceToHave'];
+    const scoreBasedSortKeys = ['overall', 'nonNegotiable', 'important', 'niceToHave', 'recommendationScore'];
 
     this.filteredDistros.sort((a, b) => {
       if (scoreBasedSortKeys.includes(sortBy)) {
@@ -534,9 +727,10 @@ class DistroComparator {
 
   // Render table with current filtered data
   renderTable() {
+    console.time('renderTable'); // Start timer for renderTable
     const tableContainer = document.getElementById('table-container');
     if (!tableContainer) {
-      
+      console.timeEnd('renderTable'); // End timer if container not found
       return;
     }
 
@@ -672,7 +866,11 @@ class DistroComparator {
             eliminateBtn.className = 'eliminate-btn';
             eliminateBtn.addEventListener('click', () => this.eliminateDistro(distro.name));
             td.appendChild(eliminateBtn);
-          } else {
+          } else if (key === 'recommendationScore') {
+            // Display recommendation score, rounded to 2 decimal places
+            td.textContent = distro.recommendationScore != null ? distro.recommendationScore.toFixed(2) : '';
+          }
+          else {
             const value = distro[key];
             if (Array.isArray(value)) {
               td.textContent = value.join(', ');
@@ -691,6 +889,7 @@ class DistroComparator {
 
     // Append table to container
     tableContainer.appendChild(table);
+    console.timeEnd('renderTable'); // End timer for renderTable
   }
 
   createDistroRow(tableBody, distro, dataHeaders) {
@@ -843,7 +1042,7 @@ class DistroComparator {
     
     
     
-
+    
 
     // Close modal when clicking outside or on close button.
     // Using .onclick to ensure only one handler is attached, overwriting previous if any.
@@ -888,11 +1087,18 @@ class DistroComparator {
 
   // Update statistics display
   updateStats() {
+      // Update the filtered and total count in the stats display
       const filteredCountElem = document.getElementById('filtered-count');
       const totalCountElem = document.getElementById('total-count');
       if (filteredCountElem && totalCountElem) {
           filteredCountElem.textContent = this.filteredDistros.length;
           totalCountElem.textContent = this.allDistros.length;
+      }
+      
+      // Update the header stats display with formatted string
+      const headerStatsElem = document.getElementById('header-stats');
+      if (headerStatsElem) {
+          headerStatsElem.textContent = ` - ${this.filteredDistros.length} of ${this.allDistros.length} distros are displayed now`;
       }
   }
 
@@ -913,58 +1119,146 @@ class DistroComparator {
           badge.className = 'filter-badge attribute-badge';
           badge.textContent = `${formattedAttr}: ${priorityLabel}`;
           container.appendChild(badge);
+          // Add reset icon to badge for priority filter
+          const resetIcon = document.createElement('span');
+          resetIcon.className = 'reset-icon';
+          resetIcon.textContent = ' ✕';
+          resetIcon.title = 'Reset filter';
+          resetIcon.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.resetFilter(attributeName);
+          });
+          badge.appendChild(resetIcon);
       });
+ 
+      // Display attribute-specific filters
+      for (const attributeName in this.currentFilters.attributeFilters) {
+          const filterValue = this.currentFilters.attributeFilters[attributeName];
+          if (filterValue !== undefined && filterValue !== null &&
+              !(Array.isArray(filterValue) && filterValue.length === 0) &&
+              !(typeof filterValue === 'boolean' && filterValue === false)) { // Don't show 'false' for booleans
+              const formattedAttr = attributeName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              let displayValue = Array.isArray(filterValue) ? filterValue.join(', ') : String(filterValue);
+              const badge = document.createElement('span');
+              badge.className = 'filter-badge attribute-badge';
+              badge.textContent = `${formattedAttr}: ${displayValue}`;
+              container.appendChild(badge);
+              // Add reset icon to badge for value filter
+              const resetIcon = document.createElement('span');
+              resetIcon.className = 'reset-icon';
+              resetIcon.textContent = ' ✕';
+              resetIcon.title = 'Reset filter';
+              resetIcon.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  this.resetFilter(attributeName);
+              });
+              badge.appendChild(resetIcon);
+          }
+      }
+  }
+  // Reset a filter attribute to default values
+  resetFilter(attributeName) {
+      const attrDiv = document.querySelector(`.filter-attribute[data-attribute="${attributeName}"]`);
+      if (!attrDiv) return;
+      // Reset priority buttons to default ("Don't care" = value 1)
+      const buttons = attrDiv.querySelectorAll('.priority-button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      buttons.forEach(btn => {
+          if (btn.dataset.value === '1') btn.classList.add('active');
+      });
+      // Reset value control to default
+      const type = attrDiv.dataset.type;
+      if (type === 'boolean') {
+          const sw = attrDiv.querySelector('.custom-switch');
+          if (sw.classList.contains('on')) {
+              sw.click(); // toggle off to false
+          }
+      } else if (type === 'number' || type === 'scale') {
+          const inp = attrDiv.querySelector('input[type="range"]');
+          inp.value = inp.min;
+          inp.dispatchEvent(new Event('input'));
+      } else {
+          const select = attrDiv.querySelector('select.tom-select');
+          if (select && select.tomselect) {
+              select.tomselect.clear();
+          }
+      }
+      this.filterDistros();
+      this.updateActiveFilters();
   }
 }
 
 // Initialize application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  console.time('DOMContentLoaded handler'); // Start timer for DOMContentLoaded
   const app = new DistroComparator();
   Promise.all([app.loadFilterTemplate(), app.loadDistrosFromJSON()]).then(() => {
-    // Defer filter rendering slightly to ensure DOM is fully ready for manipulation
-    setTimeout(() => {
-        app.renderFilterControls();
-    }, 0);
-    // filterDistros also calls renderTable, which should be fine as it targets a different part of the DOM
-    // and also happens after the Promise.all.
-    app.filterDistros();
-      // Attach priority filter change handlers
-      ['filterNonNegotiable', 'filterImportant', 'filterNiceToHave'].forEach(id => {
-          const cb = document.getElementById(id);
-          if (cb) {
-              cb.addEventListener('change', () => {
-                  // Map checkbox id to currentFilters key
-                  const key = id === 'filterNonNegotiable' ? 'nonNegotiable' : id === 'filterImportant' ? 'important' : 'niceToHave';
-                  app.currentFilters[key] = cb.checked;
-                  app.updateActiveFilters();
-                  app.filterDistros();
-              });
-          }
-      });
-      // Initial display of active filters
-      app.updateActiveFilters();
-  });
-
-  // Add collapsible functionality to Detailed Filters section
-  const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
-  const filtersContent = document.getElementById('filters-content');
-  
-  if (toggleFiltersBtn && filtersContent) {
-    toggleFiltersBtn.addEventListener('click', () => {
-      filtersContent.classList.toggle('collapsed');
-      toggleFiltersBtn.textContent = filtersContent.classList.contains('collapsed') ? '►' : '▼';
-    });
+    // Initialize currentFilters based on checkbox states after DOM is ready and data loaded
+    const nonNegotiableCb = document.getElementById('filterNonNegotiable');
+    const importantCb = document.getElementById('filterImportant');
+    const niceToHaveCb = document.getElementById('filterNiceToHave');
+    if (nonNegotiableCb) app.currentFilters.nonNegotiable = nonNegotiableCb.checked;
+    if (importantCb) app.currentFilters.important = importantCb.checked;
+    if (niceToHaveCb) app.currentFilters.niceToHave = niceToHaveCb.checked;
     
-    // Ensure filters expanded on load
-    filtersContent.classList.remove('collapsed');
-    toggleFiltersBtn.textContent = '▼';
-  }
-// Subsection toggles
-document.querySelectorAll('.subsection-toggle-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        const subsection = button.closest('.subsection');
-        subsection.classList.toggle('collapsed');
-        button.textContent = subsection.classList.contains('collapsed') ? '►' : '▼';
+    // Defer filter rendering slightly to ensure DOM is fully ready for manipulation
+    console.log('Scheduling renderFilterControls via setTimeout');
+    setTimeout(() => {
+        console.time('setTimeout renderFilterControls'); // Start timer for setTimeout callback
+        app.renderFilterControls();
+        console.timeEnd('setTimeout renderFilterControls'); // End timer for setTimeout callback
+    }, 0);
+    // Apply initial filter based on current state
+    console.log('Calling initial filterDistros');
+    app.filterDistros();
+    // Attach priority filter change handlers
+    ['filterNonNegotiable', 'filterImportant', 'filterNiceToHave'].forEach(id => {
+        const cb = document.getElementById(id);
+        if (cb) {
+            cb.addEventListener('change', () => {
+                // Map checkbox id to currentFilters key
+                const key = id === 'filterNonNegotiable' ? 'nonNegotiable' : id === 'filterImportant' ? 'important' : 'niceToHave';
+                app.currentFilters[key] = cb.checked;
+                app.updateActiveFilters();
+                console.log(`Checkbox ${id} changed, calling filterDistros`);
+                app.filterDistros();
+            });
+        }
     });
+    // Initial display of active filters
+    app.updateActiveFilters();
+    console.timeEnd('DOMContentLoaded handler'); // End timer for DOMContentLoaded
+// Add event listeners for scroll arrows inside DOMContentLoaded
+document.getElementById('scroll-to-top').addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+
+document.getElementById('scroll-to-bottom').addEventListener('click', () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 });
+// Removed duplicate event listeners to fix errors and prevent null reference issues.
+   });
+ 
+   // Add collapsible functionality to Detailed Filters section
+   const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+   const filtersContent = document.getElementById('filters-content');
+   
+   if (toggleFiltersBtn && filtersContent) {
+     toggleFiltersBtn.addEventListener('click', () => {
+       filtersContent.classList.toggle('collapsed');
+       toggleFiltersBtn.textContent = filtersContent.classList.contains('collapsed') ? '►' : '▼';
+     });
+     
+     // Ensure filters expanded on load
+     filtersContent.classList.remove('collapsed');
+     toggleFiltersBtn.textContent = '▼';
+   }
+   // Subsection toggles
+   document.querySelectorAll('.subsection-toggle-btn').forEach(button => {
+       button.addEventListener('click', () => {
+           const subsection = button.closest('.subsection');
+           subsection.classList.toggle('collapsed');
+           button.textContent = subsection.classList.contains('collapsed') ? '►' : '▼';
+       });
+   });
+ });

@@ -1,4 +1,46 @@
 # Changelog
+## [2025-06-09, 21:02:00 (Europe/Madrid)] Documentation Update - Filter Logic
+* Added a dedicated "Filter Logic" section to [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md) explaining the detailed filter application flow, default behaviors, and priority handling.
+* Included a Mermaid diagram in [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md) to visualize the filter system architecture and its integration with the overall project.
+### Files Modified:
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
+## [2025-06-09, 20:21:00 (Europe/Madrid)] Corrected Filter Logic
+* Fixed bug where detailed attribute filters were applied even if the corresponding summary checkbox was not checked.
+* Modified `filterDistros()` in [`script.js`](script.js) to ensure detailed attribute filters are only applied when the attribute's priority matches a checked summary filter (Non-Negotiable, Important, or Nice-to-Have).
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+## [2025-06-09, 20:07:00 (Europe/Madrid)] Revised Filter Logic Implementation
+* Fixed bug where summary checkboxes did not correctly filter distributions based on individual attribute priorities and values.
+* Refactored `filterDistros()` to first apply detailed attribute filters based on user-set values, then apply summary-level filters (Non-Negotiable, Important, Nice-to-Have) cumulatively.
+* Ensured dynamic handling of all distributions from `data/distros`.
+* Updated recommendation score recalculation, sorting, rendering, stats, and filter badges.
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+
+## [2025-06-09] Multiple Selection Enhancement
+* Enabled multiple selections for both array and string attribute types
+* Updated Tom Select dropdowns to support multi-select for most options
+
+### Files Modified:
+- [`script.js`](script.js)
+
+## [2025-06-09] Tom Select Integration
+* Replaced custom dropdowns with Tom Select library (v2.3.1)
+* Improved accessibility and UX for parameter selection
+* Added CDN links to Tom Select in index.html
+* Modified renderValueControl and populateSelectOptions in script.js
+* Added custom styles for Tom Select in styles.css
+* Updated Developer Guide with integration details
+
+### Files Modified:
+- [`index.html`](index.html)
+- [`script.js`](script.js)
+- [`styles.css`](styles.css)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
 
 ## 2025-06-01, 02:04:11 (Europe/Madrid)
 * Implemented core functionality of Linux distribution comparison tool
@@ -112,3 +154,64 @@ The filter controls now feature interactive sliders for each setting, providing 
 ### Files Modified:
 - [`script.js`](script.js)
 - [`docs/Changelog.md`](docs/Changelog.md)
+
+## [2025-06-09] "Based On" Filter Control
+* Added a filter control for the "based_on" criteria in the Detailed Filters section.
+* Ensured the filter functions as a multiple-choice selector, similar to other array filters.
+* Updated `script.js` to correctly render and apply the "based_on" filter.
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+
+## [09/06/2025] Recommendation Engine Plan Documentation
+
+*   Created a detailed plan for the Recommendation Engine implementation.
+*   Updated documentation files to reflect the new plan and project status.
+
+### Files Modified:
+- [`docs/RecommendationEnginePlan.md`](docs/RecommendationEnginePlan.md) (New File)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
+
+## [09/06/2025, 6:50:00 pm] Recommendation Engine Implementation
+* Implemented the Recommendation Engine scoring algorithm as per [RecommendationEnginePlan.md](docs/RecommendationEnginePlan.md)
+* Added `calculateRecommendationScore()` method to `DistroComparator` class
+* Modified `filterDistros()` to calculate recommendation scores
+* Updated `sortDistros()` to include 'recommendationScore' as sortable key
+* Updated project documentation to reflect implementation completion
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
+
+## [09/06/2025, 7:02:47 pm] Fix Default Filter Settings
+* Problem solved: Default filter settings were not neutral, causing unintended filtering and visibility issues with distributions.
+* How decided: Based on user feedback indicating non-neutral defaults, code analysis revealed issues in renderValueControl and filterDistros methods. Changes were proposed and approved to set neutral defaults and correct priority handling.
+* Implications: Ensures all distributions are visible by default, improving user experience by reducing bias and making the application more intuitive and user-friendly.
+* What's been implemented: Set neutral default values for all filter types in renderValueControl (e.g., booleans to false, ranges to minimum/neutral values) and fixed the filterDistros method to properly handle 'Non-negotiable' priority by removing it from the skip condition.
+* Changes made to code logic: Updated renderValueControl to initialize with neutral values and modified filterDistros to apply filtering correctly for 'Non-negotiable' priorities.
+
+### Files Modified:
+- [`script.js`](script.js)
+
+## [09/06/2025, 8:37:00 pm (Europe/Madrid)] Add Reset Icon to Active Filters Badges
+* Added a reset icon ("✕") to each active filter badge, allowing users to clear individual filter settings.
+* Implemented the resetFilter function in script.js to reset the filter to its default state.
+* Added CSS styling for the reset icon to improve visibility and usability.
+
+### Files Modified:
+- [`script.js`](script.js)
+- [`styles.css`](styles.css)
+- [`docs/Changelog.md`](docs/Changelog.md)
+
+### 2025-06-09 - Filter Attribute Help Icons
+* Added ? icons next to filter labels in detailed filter section
+* Implemented hover text showing attribute descriptions
+* Descriptions loaded from data/template_descriptions.json
+* Added CSS styling for help icons
+* Updated script.js to load descriptions and create tooltips
