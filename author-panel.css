@@ -1,0 +1,154 @@
+/* Author Panel Styles */
+.author-panel-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 350px;
+  height: 100%;
+  background: linear-gradient(135deg, #6a0dad, #4b0082); /* Dark purple gradient */
+  z-index: 1000; /* Ensure it's above other content */
+  transform: translateX(100%); /* Start off-screen */
+  transition: transform 0.3s ease; /* Smooth slide-in animation */
+  color: #fff; /* White text for readability */
+  padding: 20px;
+  box-sizing: border-box; /* Include padding in width */
+  overflow-y: auto; /* Allow scrolling */
+}
+
+.author-panel-overlay.visible {
+  transform: translateX(0); /* Slide in */
+}
+
+.author-panel-content {
+  position: relative; /* For close button positioning */
+  height: 100%; /* Fill parent height */
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  color: #fff; /* White close button */
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #ccc; /* Lighter color on hover */
+}
+
+.author-info {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-top: 20px; /* Space for close button */
+}
+
+.author-photo {
+  width: 120px;
+  height: 120px; /* Maintain aspect ratio */
+  border-radius: 50%;
+  border: 3px solid #fff;
+  object-fit: cover; /* Ensure image covers the area */
+}
+
+.author-info h3 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.author-info p {
+  font-size: 0.9em;
+  color: #eee;
+}
+
+.donation-section,
+.social-section {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.donate-btn {
+  display: inline-block;
+  background: #ffd700; /* Gold color */
+  color: #4b0082; /* Dark purple text */
+  padding: 10px 23px; /* Increased horizontal padding by 15% (20px * 1.15 = 23px) */
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.donate-btn:hover {
+  background-color: #ffc107; /* Slightly darker gold on hover */
+}
+
+/* Ensure animated link doesn't override donation button padding */
+.donate-btn.animated-link {
+  padding: 10px 23px !important;
+}
+
+.twitter-follow-container {
+  margin-top: 15px;
+}
+
+/* Basic responsive adjustment */
+@media (max-width: 768px) {
+  .author-panel-overlay {
+    width: 280px;
+  }
+}
+
+/* Animated Links */
+.animated-link {
+  display: inline-block;
+  color: var(--link-color, #007bff);
+  text-decoration: none;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.animated-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 5px;
+  left: 0;
+  background-color: var(--link-color, #007bff);
+  transition: width 0.3s ease;
+}
+
+.animated-link:hover {
+  color: var(--link-hover-color, #0056b3);
+}
+
+.animated-link:hover::after {
+  width: 100%;
+}
+
+/* Specific link styling */
+.support-link {
+  color: var(--accent-color-1, #ff69b4); /* Example pink */
+}
+.support-link::after {
+  background-color: var(--accent-color-1, #ff69b4);
+}
+.support-link:hover {
+  color: var(--accent-color-1-dark, #f060a8);
+}
+
+.about-link {
+  color: var(--accent-color-2, #17a2b8); /* Example cyan */
+}
+.about-link::after {
+  background-color: var(--accent-color-2, #17a2b8);
+}
+.about-link:hover {
+  color: var(--accent-color-2-dark, #138496);
+}

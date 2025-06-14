@@ -1,9 +1,8 @@
-### I have added to files at root from another project : SettingsPanel.css & SettingsPanel.js
-I want you to take inspiration from this concept to add an expandable right page that will display some info about the author of the website so people can donate or follow me on X
 
 ### Make sure the local storage is not persistent when user clears cache / maybe even when they close the website
 
-### Some Boolean sliders are displaying a "true" text when by default (after a hard refresh) they are set on false.
+### Make the Top and Bottom buttons wider elipses instead of small circle. Make them more beautiful, slightly more discrete.
+If technically feasible, they'd ideally be shown only when the user is scrolling. Is it feasible?
 
 ### UI Improvements : add a modern feel and colorful borders to the big divs and sections, please. Make the slider for the detailed filter controls purple instead of red.
 

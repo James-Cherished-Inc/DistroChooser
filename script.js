@@ -293,7 +293,8 @@ class DistroComparator {
           switchContainer.dataset.attribute = attributeName;
           // Set initial state based on attributeValue
           // Set neutral default to false for boolean attributes
-          if (false) {
+          console.log(`Rendering boolean switch for: ${attributeName}, initial value: ${attributeValue}`); // Debug log
+          if (attributeValue) { // Corrected condition to use the actual attributeValue
               switchContainer.classList.add('on');
           }
           switchContainer.addEventListener('click', () => {
@@ -1241,8 +1242,90 @@ document.getElementById('scroll-to-bottom').addEventListener('click', () => {
  
    // Add collapsible functionality to Detailed Filters section
    const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
-   const filtersContent = document.getElementById('filters-content');
    
+   // Add Author Panel functionality
+   const authorPanelBtn = document.getElementById('authorPanelBtn');
+   const authorPanelOverlay = document.getElementById('author-panel-overlay');
+   const authorPanelCloseBtn = document.querySelector('#author-panel-overlay .close-btn');
+
+   if (authorPanelBtn && authorPanelOverlay && authorPanelCloseBtn) {
+     authorPanelBtn.addEventListener('click', showAuthorPanel);
+     authorPanelCloseBtn.addEventListener('click', hideAuthorPanel);
+     // Close panel when clicking outside
+     authorPanelOverlay.addEventListener('click', (event) => {
+       if (event.target === authorPanelOverlay) {
+         hideAuthorPanel();
+       }
+     });
+   }
+
+   function showAuthorPanel() {
+     authorPanelOverlay.classList.add('visible');
+     loadTwitterWidget();
+   }
+
+   function hideAuthorPanel() {
+     authorPanelOverlay.classList.remove('visible');
+   }
+
+   function loadAuthorBio() {
+     fetch('data/author_bio.md')
+       .then(response => {
+         if (!response.ok) {
+           throw new Error(`HTTP error! status: ${response.status}`);
+         }
+         return response.text();
+       })
+       .then(text => {
+         const authorBio = document.getElementById('author-bio');
+         if (authorBio) {
+           authorBio.innerHTML = text; // Basic text insertion
+         } else {
+           console.error("Author bio element not found.");
+         }
+       })
+       .catch(error => {
+         console.error("Error fetching author bio:", error);
+         const authorBio = document.getElementById('author-bio');
+         if (authorBio) {
+           authorBio.textContent = "Failed to load author bio. Please check the console for details.";
+         }
+       });
+   }
+
+   function loadTwitterWidget() {
+     loadAuthorBio();
+     // Load X widget script if not already loaded
+     if (!window.twttr) {
+       const script = document.createElement('script');
+       script.src = "https://platform.twitter.com/widgets.js";
+       script.setAttribute('async', ''); // Add async attribute
+       script.setAttribute('charset', 'utf-8'); // Add charset attribute
+       document.head.appendChild(script);
+     }
+     
+     // Ensure the Twitter widget script is loaded before creating the button
+     if (window.twttr && window.twttr.widgets) {
+        twttr.widgets.createFollowButton(
+          'JamesCherished', // Your Twitter handle
+          document.querySelector('.twitter-follow-container'),
+          { size: 'large' }
+        );
+     } else {
+        // If twttr is not yet available, wait for it
+        window.twttr_events = window.twttr_events || [];
+        window.twttr_events.push(() => {
+            twttr.widgets.createFollowButton(
+              'JamesCherished', // Your Twitter handle
+              document.querySelector('.twitter-follow-container'),
+              { size: 'large' }
+            );
+        });
+     }
+   }
+
+   const filtersContent = document.getElementById('filters-content');
+
    if (toggleFiltersBtn && filtersContent) {
      toggleFiltersBtn.addEventListener('click', () => {
        filtersContent.classList.toggle('collapsed');

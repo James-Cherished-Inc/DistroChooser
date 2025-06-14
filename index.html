@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <link rel="stylesheet" href="author-panel.css?v=3">
 </head>
 <body>
     <div class="distro-comparison-container">
@@ -17,6 +18,7 @@
                 <div class="filters-header">
                     <h2>Detailed Filters<span id="header-stats"></span></h2>
                     <button id="toggleFiltersBtn" class="toggle-btn">▼</button>
+                    <button id="authorPanelBtn" class="author-btn">About</button>
                 </div>
                 <div id="filters-content">
 
@@ -255,5 +257,33 @@
   <button id="scroll-to-top">↑ Top</button>
   <button id="scroll-to-bottom">↓ Bottom</button>
 </div>
+
+    <!-- Author details panel -->
+    <div id="author-panel-overlay" class="author-panel-overlay">
+      <div class="author-panel-content">
+        <button class="close-btn">×</button>
+        <div class="author-info">
+          <img src="James_Photo.jpg" alt="Sir James Cherished" class="author-photo">
+          <h3>Sir James Cherished</h3>
+          <p>Passionate developer building open-source tools</p>
+        </div>
+        <div class="donation-section">
+          <a href="https://x.com/JamesCherished" target="_blank" rel="noopener noreferrer" class="donate-btn animated-link support-link">Support My Work</a>
+        </div>
+        <div class="social-section">
+          <div class="twitter-follow-container">
+            <!-- X Follow Widget will be injected here -->
+          </div>
+        </div>
+        <div class="user-guide-section">
+          <h3>About Me</h3>
+          <div id="author-bio" class="user-guide-content">
+            <!-- Author bio will be loaded here -->
+            Loading bio...
+          </div>
+        </div>
+      </div>
+    </div>
+
 </body>
 </html>
