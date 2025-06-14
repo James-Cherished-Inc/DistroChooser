@@ -234,7 +234,7 @@ class DistroComparator {
                     'max': maxVal
                 },
                 step: stepVal,
-                tooltips: true
+                tooltips: false // Disable tooltips to check if they are causing the "00" display
             });
 
             const minInput = inputContainer.querySelector('.range-min-input');
@@ -243,9 +243,9 @@ class DistroComparator {
             // Link slider to input fields
             valueControlElement.noUiSlider.on('update', (values, handle) => {
                 if (handle === 0) {
-                    minInput.value = Math.round(values[handle]);
+                    minInput.value = values[handle];
                 } else {
-                    maxInput.value = Math.round(values[handle]);
+                    maxInput.value = values[handle];
                 }
             });
 
@@ -296,7 +296,8 @@ class DistroComparator {
         controlElement.classList.add('control-range-slider');
 
         const isScale = attributeType === 'scale';
-        minVal = isScale ? 1 : 0;
+        // Set minVal=1 for scale attributes and specific number attributes (RAM, disk, CPU)
+        minVal = isScale ? 1 : (['ram_range', 'disk_range', 'cpu_range'].includes(attributeName) ? 1 : 0);
         maxVal = isScale ? 10 : 100;
         stepVal = isScale ? 1 : 1;
 
@@ -309,6 +310,7 @@ class DistroComparator {
         minInput.setAttribute('min', minVal);
         minInput.setAttribute('max', maxVal);
         minInput.setAttribute('step', stepVal);
+        minInput.value = minVal; // Set initial value
 
         const maxInput = document.createElement('input');
         maxInput.type = 'number';
@@ -316,10 +318,14 @@ class DistroComparator {
         maxInput.setAttribute('min', minVal);
         maxInput.setAttribute('max', maxVal);
         maxInput.setAttribute('step', stepVal);
+        maxInput.value = maxVal; // Set initial value
 
         inputContainer.appendChild(minInput);
         inputContainer.appendChild(document.createTextNode(' - '));
         inputContainer.appendChild(maxInput);
+
+        // Return both elements for slider initialization
+        return { controlElement, inputContainer, minVal, maxVal, stepVal, minInput, maxInput, type: attributeType };
 
         return { controlElement, inputContainer, minVal, maxVal, stepVal, type: attributeType };
 

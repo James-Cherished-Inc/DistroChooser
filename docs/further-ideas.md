@@ -1,6 +1,3 @@
-### Make the slider for the detailed filter controls purple instead of red.
-
-### The rows of the table are not clearly separated
 
 ### UI Improvement : add a modern feel and colorful borders to the big divs and sections, please. 
 
