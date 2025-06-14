@@ -1,4 +1,11 @@
 # Changelog
+## [2025-06-09, 21:02:00 (Europe/Madrid)] Documentation Update - Filter Logic
+* Added a dedicated "Filter Logic" section to [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md) explaining the detailed filter application flow, default behaviors, and priority handling.
+* Included a Mermaid diagram in [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md) to visualize the filter system architecture and its integration with the overall project.
+### Files Modified:
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
 ## [2025-06-09, 20:21:00 (Europe/Madrid)] Corrected Filter Logic
 * Fixed bug where detailed attribute filters were applied even if the corresponding summary checkbox was not checked.
 * Modified `filterDistros()` in [`script.js`](script.js) to ensure detailed attribute filters are only applied when the attribute's priority matches a checked summary filter (Non-Negotiable, Important, or Nice-to-Have).
@@ -201,3 +208,10 @@ The filter controls now feature interactive sliders for each setting, providing 
 - [`script.js`](script.js)
 - [`styles.css`](styles.css)
 - [`docs/Changelog.md`](docs/Changelog.md)
+
+### 2025-06-09 - Filter Attribute Help Icons
+* Added ? icons next to filter labels in detailed filter section
+* Implemented hover text showing attribute descriptions
+* Descriptions loaded from data/template_descriptions.json
+* Added CSS styling for help icons
+* Updated script.js to load descriptions and create tooltips

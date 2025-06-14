@@ -339,6 +339,10 @@ body {
     background-color: #f0f0f0;
     border-radius: 4px;
     margin-bottom: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Ensure it's above other scrolling content */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: add a subtle shadow */
 }
 
 #detailed-filters .filters-header h2 {
@@ -543,12 +547,20 @@ input.control-number::-moz-range-track {
 }
 
 /* Label styling for better hierarchy */
+.label-container { /* New style for the container of label and help icon */
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px; /* Adjust as needed for spacing */
+  position: relative; /* Establish positioning context for tooltip */
+}
+
 .filter-attribute label {
   font-weight: bold;
   font-size: 1.1em;
   color: #333;
-  margin-bottom: 8px;
-  display: block;
+  /* margin-bottom: 8px; Removed as it's now on label-container */
+  display: inline-block; /* Changed to inline-block to sit next to icon */
+  margin-right: 5px; /* Space between label text and icon */
 }
 
 /* Custom Switch Styles */
@@ -663,6 +675,68 @@ input.control-number::-moz-range-track {
   transform: scale(1.1);
 }
 
+/* Custom tooltip styles */
+.filter-attribute .help-icon[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 125%; /* Position above the icon */
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  white-space: nowrap; /* Prevent text wrapping */
+  z-index: 100; /* Ensure it's above other elements */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.filter-attribute .help-icon[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 115%; /* Position just below the tooltip text */
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.filter-attribute .help-icon:hover::after,
+.filter-attribute .help-icon:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
 #scroll-arrows button:active {
   transform: scale(0.95);
+}
+/* Help icon styles */
+.filter-attribute .help-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: help;
+  /* margin-left: 5px; Removed as margin-right is on label */
+  transition: background 0.3s ease;
+  position: relative; /* Ensure z-index works */
+  z-index: 10; /* Ensure it's above other elements if any overlap */
+}
+
+.filter-attribute .help-icon:hover {
+  background: #0056b3;
 }
