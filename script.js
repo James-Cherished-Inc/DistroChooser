@@ -1,3 +1,5 @@
+import { SessionState } from './SessionState.js';
+
 class DistroComparator {
   constructor() {
     this.allDistros = []; // Load from comprehensive database
@@ -13,6 +15,7 @@ class DistroComparator {
     };
     this.filterTemplate = null; // To store the loaded filter template
     this.tableHeadersGenerated = false; // Track if headers have been generated
+    this.stateHandler = SessionState; // Use session-only handler
   }
 
   // Load the filter template from JSON
@@ -1240,6 +1243,21 @@ document.getElementById('scroll-to-bottom').addEventListener('click', () => {
 // Removed duplicate event listeners to fix errors and prevent null reference issues.
    });
  
+   // Add event listener to clear state on page unload
+   window.addEventListener('beforeunload', () => {
+     app.filteredDistros = [];
+     app.eliminatedDistros.clear();
+     app.currentFilters = {
+       nonNegotiable: false,
+       important: false,
+       niceToHave: false,
+       search: '',
+       sortBy: 'overall',
+       attributeFilters: {}
+     };
+     console.log('Application state cleared on unload.');
+   });
+
    // Add collapsible functionality to Detailed Filters section
    const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
    

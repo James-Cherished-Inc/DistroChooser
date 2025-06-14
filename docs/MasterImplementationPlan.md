@@ -54,7 +54,7 @@ The project aims to provide a comprehensive tool for users to choose a Linux dis
 - [x] Recommendation engine
 - [x] Author Information Panel
 - [ ] Accessibility features
-- [ ] Performance optimizations
+- [x] Performance optimizations - Implemented session-only persistence to improve privacy and reduce storage overhead
 - [ ] Improve mobile responsiveness
 - [ ] Expand test coverage
 

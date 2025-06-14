@@ -1,6 +1,4 @@
 
-### Make sure the local storage is not persistent when user clears cache / maybe even when they close the website
-
 ### Make the Top and Bottom buttons wider elipses instead of small circle. Make them more beautiful, slightly more discrete.
 If technically feasible, they'd ideally be shown only when the user is scrolling. Is it feasible?
 
