@@ -250,3 +250,5 @@ The filter controls now feature interactive sliders for each setting, providing 
   - Made "About" button 30% larger for better visibility
   - Fixed XSS vulnerability by removing insecure innerHTML assignment
   - Improved text readability with better line spacing
+
+## `16/06/2025` - Expanded the "Contributing" section in `README.md` to provide detailed guidelines for contributions related to distro information, UI, performance, and backend. Included information about the project creator and a link to support their work on X (Twitter).
