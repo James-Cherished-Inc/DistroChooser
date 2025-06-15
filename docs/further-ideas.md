@@ -1,13 +1,9 @@
-### I have added to files at root from another project : SettingsPanel.css & SettingsPanel.js
-I want you to take inspiration from this concept to add an expandable right page that will display some info about the author of the website so people can donate or follow me on X
 
-### Make sure the local storage is not persistent when user clears cache / maybe even when they close the website
-
-### Some Boolean sliders are displaying a "true" text when by default (after a hard refresh) they are set on false.
-
-### UI Improvements : add a modern feel and colorful borders to the big divs and sections, please. Make the slider for the detailed filter controls purple instead of red.
+### UI Improvement : add a modern feel and colorful borders to the big divs and sections, please. 
 
 # Useful
+
+## Allow users to add one of the 56 distros from the list as a new row by typing the name, just on top of the table. This allows to add a distro that's been filtered out, to compare it with the displayed results
 
 ## Can we increase the width of the "Description" column in the table please?
 

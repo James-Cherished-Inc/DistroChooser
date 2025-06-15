@@ -1,3 +1,5 @@
+import { SessionState } from './SessionState.js';
+
 class DistroComparator {
   constructor() {
     this.allDistros = []; // Load from comprehensive database
@@ -13,6 +15,7 @@ class DistroComparator {
     };
     this.filterTemplate = null; // To store the loaded filter template
     this.tableHeadersGenerated = false; // Track if headers have been generated
+    this.stateHandler = SessionState; // Use session-only handler
   }
 
   // Load the filter template from JSON
@@ -89,30 +92,23 @@ class DistroComparator {
             continue; // Skip unknown types
         }
 
-        // Determine the category placeholder based on attribute name (this needs refinement based on your template structure)
-        // For now, a simple mapping based on the provided index.html structure
+        // Determine the category placeholder based on attribute name and the new category structure
         let categoryPlaceholderId;
-        if (['based_on'].includes(attributeName)) {
+        if (['based_on', 'cost'].includes(attributeName)) {
             categoryPlaceholderId = 'general-info-filters';
-        } else if (['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'].includes(attributeName)) {
+        } else if (['ram_range', 'ram_requirements_recommended', 'disk_range', 'disk_requirements_recommended', 'cpu_range', 'cpu_cores_minimum', 'architecture_support'].includes(attributeName)) {
             categoryPlaceholderId = 'system-requirements-filters';
-        } else if (['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_reliance', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'].includes(attributeName)) {
-            categoryPlaceholderId = 'non-negotiable-criteria-filters';
-        } else if (['free_software_ideology', 'proprietary_software_required', 'sysadmin', 'sysadmin_vulnerability', 'illegal'].includes(attributeName)) {
-            categoryPlaceholderId = 'important-criteria-filters';
-        } else if (['security_vulnerability', 'active_community'].includes(attributeName)) {
-            categoryPlaceholderId = 'nice-to-have-criteria-filters';
         } else if (['ram_usage_idle', 'disk_space_installed', 'iso_size', 'boot_time', 'package_manager', 'desktop_environments', 'default_desktop', 'init_system', 'kernel', 'release_model', 'release_cycle_months', 'support_duration_years', 'update_frequency'].includes(attributeName)) {
             categoryPlaceholderId = 'detailed-specifications-filters';
-        } else if (['privacy_rating', 'security_rating', 'firewall_default', 'firewall', 'encryption_support', 'selinux_apparmor', 'automatic_updates'].includes(attributeName)) {
+        } else if (['secure_boot', 'boot_level_vulnerability', 'telemetry', 'sysadmin_vulnerability', 'illegal', 'privacy_rating', 'security_rating', 'firewall_default', 'firewall', 'encryption_support', 'selinux_apparmor', 'automatic_updates', 'security_vulnerability'].includes(attributeName)) {
             categoryPlaceholderId = 'security-privacy-filters';
-        } else if (['wifi', 'bluetooth', 'touchscreen', 'hidpi', 'arm_', 'raspberry'].includes(attributeName)) {
+        } else if (['nvidia_support', 'wifi', 'bluetooth', 'touchscreen', 'hidpi', 'arm_', 'raspberry'].includes(attributeName)) {
             categoryPlaceholderId = 'hardware-compatibility-filters';
-        } else if (['cpu_usage_idle', 'disk_io_performance', 'network_performance', 'gaming_performance'].includes(attributeName)) {
+        } else if (['responsive', 'resource_efficient', 'power_efficient', 'lightweight', 'cpu_usage_idle', 'disk_io_performance', 'network_performance', 'gaming_performance'].includes(attributeName)) {
             categoryPlaceholderId = 'performance-metrics-filters';
-        } else if (['beginner_friendliness', 'installer_difficulty', 'post_install_setup', 'gui_tools_availability', 'software_center_quality'].includes(attributeName)) {
+        } else if (['gui_customization', 'terminal_range', 'app_compatibility', 'beginner_friendliness', 'installer_difficulty', 'post_install_setup', 'gui_tools_availability', 'software_center_quality'].includes(attributeName)) {
             categoryPlaceholderId = 'usability-filters';
-        } else if (['development_tools', 'programming_languages_included', 'container_support', 'virtualization_support', 'server_suitability', 'enterprise_features'].includes(attributeName)) {
+        } else if (['sysadmin', 'development_tools', 'programming_languages_included', 'container_support', 'virtualization_support', 'server_suitability', 'enterprise_features'].includes(attributeName)) {
             categoryPlaceholderId = 'development-professional-use-filters';
         } else if (['multimedia_codecs', 'audio_quality', 'video_editing_support', 'graphics_design_tools'].includes(attributeName)) {
             categoryPlaceholderId = 'multimedia-creativity-filters';
@@ -120,28 +116,24 @@ class DistroComparator {
             categoryPlaceholderId = 'accessibility-filters';
         } else if (['languages_supported', 'rtl_language_support', 'regional_variants'].includes(attributeName)) {
             categoryPlaceholderId = 'localization-filters';
-        } else if (['forum_activity', 'github_activity', 'commercial_support', 'third_party_repositories', 'flatpak_support', 'snap_support', 'appimage_support'].includes(attributeName)) {
+        } else if (['documentation_quality', 'active_community', 'forum_activity', 'github_activity', 'commercial_support', 'third_party_repositories', 'flatpak_support', 'snap_support', 'appimage_support'].includes(attributeName)) {
             categoryPlaceholderId = 'community-ecosystem-filters';
-        } else if (['live_usb_support', 'persistence_support', 'snapshot_rollback', 'immutable_system', 'unique_features', 'target_audience'].includes(attributeName)) {
+        } else if (['free_software_ideology', 'proprietary_software_required', 'live_usb_support', 'persistence_support', 'snapshot_rollback', 'immutable_system', 'unique_features', 'target_audience'].includes(attributeName)) {
             categoryPlaceholderId = 'special-features-filters';
-        } else if (['manual_intervention_frequency', 'breaking_changes_frequency', 'long_term_stability', 'backup_tools_included'].includes(attributeName)) {
+        } else if (['stability', 'updates', 'manual_intervention_frequency', 'breaking_changes_frequency', 'long_term_stability', 'backup_tools_included'].includes(attributeName)) {
             categoryPlaceholderId = 'maintenance-filters';
         } else {
             // If an attribute doesn't match any known category, skip it for now
-            
             continue;
         }
 
 
         const categoryPlaceholder = document.getElementById(categoryPlaceholderId);
         
-
         if (!categoryPlaceholder) {
-            
             continue;
         }
         
-
         const attributeDiv = document.createElement('div');
         attributeDiv.classList.add('filter-attribute');
         attributeDiv.dataset.attribute = attributeName;
@@ -209,47 +201,74 @@ class DistroComparator {
         valueControlContainer.classList.add('attribute-value-control');
         attributeDiv.appendChild(valueControlContainer);
 
+        // Declare variables at the top of the block
+        let inputContainer, minVal, maxVal, stepVal;
+
         // Render the appropriate value control
-        const valueControlElement = this.renderValueControl(attributeName, attributeType, attributeValue);
+        const controlResult = this.renderValueControl(attributeName, attributeType, attributeValue);
+        let valueControlElement = controlResult.controlElement;
+
         valueControlContainer.appendChild(valueControlElement);
 
-        // Create span to display the current value (only for non-boolean types)
-        let valueDisplay; // Declare valueDisplay here
-
-        if (attributeType !== 'boolean') {
-            valueDisplay = document.createElement('span');
-            valueDisplay.classList.add('filter-value-display');
-            valueDisplay.textContent = valueControlElement.value;
-            valueControlContainer.appendChild(valueDisplay);
-        }
-
-        // Update the displayed value on input for number and scale types
         if (attributeType === 'number' || attributeType === 'scale') {
-            valueControlElement.addEventListener('input', () => {
-                valueDisplay.textContent = valueControlElement.value;
-            });
+            inputContainer = controlResult.inputContainer;
+            minVal = controlResult.minVal;
+            maxVal = controlResult.maxVal;
+            stepVal = controlResult.stepVal;
+
+            // Append input container AFTER the valueControlContainer, but still within attributeDiv
+            attributeDiv.appendChild(inputContainer);
         }
 
-        // Event listener for the value control element
-        if (valueControlElement) { // Check if an element was actually created
-            if (attributeType === 'boolean') {
-                valueControlElement.addEventListener('change', () => {
-                    this.debouncedFilterDistros();
-                });
-            } else if (attributeType === 'number' || attributeType === 'scale') {
-                valueControlElement.addEventListener('input', () => {
-                    this.debouncedFilterDistros();
-                });
-            } else if (attributeType === 'array' || attributeType === 'string') {
-                 valueControlElement.addEventListener('change', () => {
-                    this.debouncedFilterDistros();
-                 });
-            }
-        }
-      
-      
         // Append the attributeDiv to the categoryPlaceholder
         categoryPlaceholder.appendChild(attributeDiv);
+
+        // Initialize slider AFTER the element is in the DOM
+        if (attributeType === 'number' || attributeType === 'scale') {
+            // Initialize noUiSlider
+            noUiSlider.create(valueControlElement, {
+                start: [minVal, maxVal], // Initial range values (min, max)
+                connect: true, // Connect the handles with a bar
+                range: {
+                    'min': minVal,
+                    'max': maxVal
+                },
+                step: stepVal,
+                tooltips: false // Disable tooltips to check if they are causing the "00" display
+            });
+
+            const minInput = inputContainer.querySelector('.range-min-input');
+            const maxInput = inputContainer.querySelector('.range-max-input');
+
+            // Link slider to input fields
+            valueControlElement.noUiSlider.on('update', (values, handle) => {
+                if (handle === 0) {
+                    minInput.value = values[handle];
+                } else {
+                    maxInput.value = values[handle];
+                }
+            });
+
+            // Link input fields to slider
+            minInput.addEventListener('change', () => {
+                valueControlElement.noUiSlider.set([minInput.value, null]);
+                this.debouncedFilterDistros(); // Trigger filter on input change
+            });
+
+            maxInput.addEventListener('change', () => {
+                valueControlElement.noUiSlider.set([null, maxInput.value]);
+                this.debouncedFilterDistros(); // Trigger filter on input change
+            });
+
+            // Add a 'change' event listener to the slider itself to trigger filtering
+            valueControlElement.noUiSlider.on('change', () => {
+                this.debouncedFilterDistros();
+            });
+        } else if (attributeType === 'boolean' || attributeType === 'array' || attributeType === 'string') {
+             valueControlElement.addEventListener('change', () => {
+                this.debouncedFilterDistros();
+             });
+        }
 
         // Populate select options for array/string types AFTER the element is in the DOM
         if (attributeType === 'array' || attributeType === 'string') {
@@ -264,75 +283,93 @@ class DistroComparator {
   // Render the appropriate value control based on attribute type
   renderValueControl(attributeName, attributeType, attributeValue) {
     let controlElement;
+    let inputContainer = null;
+    let minVal = null;
+    let maxVal = null;
+    let stepVal = null;
+
     switch (attributeType) {
       case 'number':
-        controlElement = document.createElement('input');
-        controlElement.type = 'range';
-        controlElement.id = `${attributeName}-value`;
-        controlElement.min = '0'; // Placeholder, will need dynamic min/max later
-        controlElement.max = '100'; // Placeholder
-        // Set neutral default to minimum value for number attributes
-        controlElement.value = '0'; // Neutral minimum
-        controlElement.classList.add('control-number');
-        break;
       case 'scale':
-        controlElement = document.createElement('input');
-        controlElement.type = 'range';
+        controlElement = document.createElement('div');
         controlElement.id = `${attributeName}-value`;
-        controlElement.min = '1';
-        controlElement.max = '10';
-        // Set neutral default to middle value for scale attributes
-        controlElement.value = '1'; // Neutral minimum set to 1 as per user requirement for range defaults
-        controlElement.classList.add('control-scale');
-        break;
+        controlElement.classList.add('control-range-slider');
+
+        const isScale = attributeType === 'scale';
+        // Set minVal=1 for scale attributes and specific number attributes (RAM, disk, CPU)
+        minVal = isScale ? 1 : (['ram_range', 'disk_range', 'cpu_range'].includes(attributeName) ? 1 : 0);
+        maxVal = isScale ? 10 : 100;
+        stepVal = isScale ? 1 : 1;
+
+        inputContainer = document.createElement('div');
+        inputContainer.classList.add('range-input-container');
+
+        const minInput = document.createElement('input');
+        minInput.type = 'number';
+        minInput.classList.add('range-min-input');
+        minInput.setAttribute('min', minVal);
+        minInput.setAttribute('max', maxVal);
+        minInput.setAttribute('step', stepVal);
+        minInput.value = minVal; // Set initial value
+
+        const maxInput = document.createElement('input');
+        maxInput.type = 'number';
+        maxInput.classList.add('range-max-input');
+        maxInput.setAttribute('min', minVal);
+        maxInput.setAttribute('max', maxVal);
+        maxInput.setAttribute('step', stepVal);
+        maxInput.value = maxVal; // Set initial value
+
+        inputContainer.appendChild(minInput);
+        inputContainer.appendChild(document.createTextNode(' - '));
+        inputContainer.appendChild(maxInput);
+
+        // Return both elements for slider initialization
+        return { controlElement, inputContainer, minVal, maxVal, stepVal, minInput, maxInput, type: attributeType };
+
+        return { controlElement, inputContainer, minVal, maxVal, stepVal, type: attributeType };
+
       case 'boolean':
-          // Create a custom UI switch for boolean attributes with integrated label and initial state based on attributeValue
-          const switchContainer = document.createElement('div');
-          switchContainer.classList.add('custom-switch');
-          switchContainer.id = `${attributeName}-value`;
-          switchContainer.dataset.attribute = attributeName;
-          // Set initial state based on attributeValue
-          // Set neutral default to false for boolean attributes
-          if (false) {
-              switchContainer.classList.add('on');
-          }
-          switchContainer.addEventListener('click', () => {
-              console.time(`Click handler for ${attributeName}`); // Start timer for click handler
-              switchContainer.classList.toggle('on');
-              const switchLabel = switchContainer.querySelector('.switch-label');
-              if (switchLabel) {
-                  switchLabel.textContent = switchContainer.classList.contains('on') ? 'True' : 'False';
-              }
-              const event = new Event('change');
-              switchContainer.dispatchEvent(event); // Dispatch change event to trigger filterDistros
-              console.timeEnd(`Click handler for ${attributeName}`); // End timer for click handler
-          });
-          // Create toggle element
-          const switchToggle = document.createElement('div');
-          switchToggle.classList.add('switch-toggle');
-          switchContainer.appendChild(switchToggle);
-          // Create label element for True/False state
-          const switchLabel = document.createElement('span');
-          switchLabel.classList.add('switch-label');
-          switchLabel.textContent = attributeValue ? 'True' : 'False'; // Initial text based on attributeValue
-          switchContainer.appendChild(switchLabel);
-          return switchContainer;
+        const switchContainer = document.createElement('div');
+        switchContainer.classList.add('custom-switch');
+        switchContainer.id = `${attributeName}-value`;
+        switchContainer.dataset.attribute = attributeName;
+
+        if (attributeValue) {
+          switchContainer.classList.add('on');
+        }
+
+        const switchToggle = document.createElement('div');
+        switchToggle.classList.add('switch-toggle');
+        switchContainer.appendChild(switchToggle);
+
+        const switchLabel = document.createElement('span');
+        switchLabel.classList.add('switch-label');
+        switchLabel.textContent = attributeValue ? 'True' : 'False';
+        switchContainer.appendChild(switchLabel);
+
+        controlElement = switchContainer;
+        break;
+
       case 'array':
       case 'string':
         controlElement = document.createElement('select');
         controlElement.id = `${attributeName}-value`;
-        controlElement.multiple = true; // Allow multiple selections for both array and string types
-        controlElement.dataset.param = attributeName; // Store attribute name for Tom Select
-        controlElement.classList.add('tom-select'); // Add class for Tom Select
+        controlElement.multiple = true;
+        controlElement.dataset.param = attributeName;
+        controlElement.classList.add('tom-select');
         controlElement.classList.add(`control-${attributeType}`);
         break;
+
       default:
-        controlElement = document.createElement('div'); // Return an empty div for unknown/skipped types
+        controlElement = document.createElement('div');
         break;
     }
+
     // Add a class for styling based on control type
     controlElement.classList.add(`control-${attributeType}`);
-    return controlElement;
+
+    return { controlElement, type: attributeType };
   }
 
   // Populate select options for array and string attributes
@@ -618,12 +655,17 @@ class DistroComparator {
             list = list.filter(d => d[name] === true);
           }
         } else if (type === 'number' || type === 'scale') {
-          const inp = attrDiv.querySelector('input[type="range"]');
-          val = parseInt(inp.value, 10);
-          const def = parseInt(inp.min, 10);
-          active = val > def; // A range filter is active if the value is not the minimum
+          const slider = attrDiv.querySelector('.control-range-slider').noUiSlider;
+          const rangeValues = slider.get().map(Number); // Get [min, max] as numbers
+          val = rangeValues;
+          // A range filter is active if the selected range is different from the full range
+          const range = slider.options.range;
+          active = rangeValues[0] !== range.min || rangeValues[1] !== range.max;
           if (applyFilter && active) {
-            list = list.filter(d => typeof d[name] === 'number' && d[name] >= val);
+            list = list.filter(d => {
+              const distroValue = d[name];
+              return typeof distroValue === 'number' && distroValue >= rangeValues[0] && distroValue <= rangeValues[1];
+            });
           }
         } else { // array or string
           const sel = attrDiv.querySelector('select.tom-select');
@@ -667,7 +709,10 @@ class DistroComparator {
             if (type === 'boolean') {
               list = list.filter(d => d[name] === true);
             } else if (type === 'number' || type === 'scale') {
-              list = list.filter(d => typeof d[name] === 'number' && d[name] >= filterVal);
+              // Filter based on the selected range [min, max]
+              if (Array.isArray(filterVal) && filterVal.length === 2) {
+                list = list.filter(d => typeof d[name] === 'number' && d[name] >= filterVal[0] && d[name] <= filterVal[1]);
+              }
             } else {
               list = list.filter(d => {
                 const dvd = Array.isArray(d[name]) ? d[name] : [d[name]];
@@ -745,8 +790,8 @@ class DistroComparator {
     const columnGroups = [
       { label: 'Actions', keys: ['actions'] },
       { label: 'General Info', keys: ['name', 'description', 'website', 'based_on'] },
-      { label: 'System Requirements', keys: ['ram_requirements_minimum', 'ram_requirements_recommended', 'disk_requirements_minimum', 'disk_requirements_recommended', 'cpu_requirements_minimum', 'cpu_cores_minimum', 'architecture_support'] },
-      { label: 'Non-Negotiable Criteria', keys: ['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_reliance', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'] },
+      { label: 'System Requirements', keys: ['ram_range', 'ram_requirements_recommended', 'disk_range', 'disk_requirements_recommended', 'cpu_range', 'cpu_cores_minimum', 'architecture_support'] },
+      { label: 'Non-Negotiable Criteria', keys: ['secure_boot', 'boot_level_vulnerability', 'gui_customization', 'terminal_range', 'app_compatibility', 'nvidia_support', 'telemetry', 'stability', 'updates', 'responsive', 'resource_efficient', 'power_efficient', 'cost', 'documentation_quality', 'lightweight'] },
       { label: 'Important Criteria', keys: ['free_software_ideology', 'proprietary_software_required', 'sysadmin', 'sysadmin_vulnerability', 'illegal'] },
       { label: 'Nice-To-Have Criteria', keys: ['security_vulnerability', 'active_community'] },
       { label: 'Detailed Specifications', keys: ['ram_usage_idle', 'disk_space_installed', 'iso_size', 'boot_time', 'package_manager', 'desktop_environments', 'default_desktop', 'init_system', 'kernel', 'release_model', 'release_cycle_months', 'support_duration_years', 'update_frequency'] },
@@ -973,6 +1018,7 @@ class DistroComparator {
     const content = document.getElementById('modalContent');
     
     
+    
 
     if (!modal || !content) {
         
@@ -1037,7 +1083,9 @@ class DistroComparator {
     content.style.maxHeight = 'calc(80vh - 40px)'; // Adjust based on padding/borders of modal-content
     content.style.overflowY = 'auto';
     
+    
 
+    
     
     
     
@@ -1174,9 +1222,9 @@ class DistroComparator {
               sw.click(); // toggle off to false
           }
       } else if (type === 'number' || type === 'scale') {
-          const inp = attrDiv.querySelector('input[type="range"]');
-          inp.value = inp.min;
-          inp.dispatchEvent(new Event('input'));
+          const slider = attrDiv.querySelector('.control-range-slider').noUiSlider;
+          const range = slider.options.range;
+          slider.set([range.min, range.max]); // Reset to full range
       } else {
           const select = attrDiv.querySelector('select.tom-select');
           if (select && select.tomselect) {
@@ -1236,13 +1284,103 @@ document.getElementById('scroll-to-top').addEventListener('click', () => {
 document.getElementById('scroll-to-bottom').addEventListener('click', () => {
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 });
-// Removed duplicate event listeners to fix errors and prevent null reference issues.
+
+
    });
  
+   // Add event listener to clear state on page unload
+   window.addEventListener('beforeunload', () => {
+     app.filteredDistros = [];
+     app.eliminatedDistros.clear();
+     app.currentFilters = {
+       nonNegotiable: false,
+       important: false,
+       niceToHave: false,
+       search: '',
+       sortBy: 'overall',
+       attributeFilters: {}
+     };
+     console.log('Application state cleared on unload.');
+   });
+
    // Add collapsible functionality to Detailed Filters section
    const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
-   const filtersContent = document.getElementById('filters-content');
    
+   // Add Author Panel functionality
+   const authorPanelBtn = document.getElementById('authorPanelBtn');
+   const authorPanelOverlay = document.getElementById('author-panel-overlay');
+   const authorPanelCloseBtn = document.querySelector('#author-panel-overlay .close-btn');
+
+   if (authorPanelBtn && authorPanelOverlay && authorPanelCloseBtn) {
+     authorPanelBtn.addEventListener('click', showAuthorPanel);
+     authorPanelCloseBtn.addEventListener('click', hideAuthorPanel);
+     // Close panel when clicking outside
+     authorPanelOverlay.addEventListener('click', (event) => {
+       if (event.target === authorPanelOverlay) {
+         hideAuthorPanel();
+       }
+     });
+   }
+
+   function showAuthorPanel() {
+     authorPanelOverlay.classList.add('visible');
+     loadTwitterWidget();
+   }
+
+   function hideAuthorPanel() {
+     authorPanelOverlay.classList.remove('visible');
+   }
+
+   function loadAuthorBio() {
+     fetch('data/author_bio.md')
+       .then(response => {
+         if (!response.ok) {
+           throw new Error(`HTTP error! status: ${response.status}`);
+         }
+         return response.text();
+       })
+       .catch(error => {
+         console.error("Error fetching author bio:", error);
+         const authorBio = document.getElementById('author-bio');
+         if (authorBio) {
+           authorBio.textContent = "Failed to load author bio. Please check the console for details.";
+         }
+       });
+   }
+
+   function loadTwitterWidget() {
+     loadAuthorBio();
+     // Load X widget script if not already loaded
+     if (!window.twttr) {
+       const script = document.createElement('script');
+       script.src = "https://platform.twitter.com/widgets.js";
+       script.setAttribute('async', ''); // Add async attribute
+       script.setAttribute('charset', 'utf-8'); // Add charset attribute
+       document.head.appendChild(script);
+     }
+     
+     // Ensure the Twitter widget script is loaded before creating the button
+     if (window.twttr && window.twttr.widgets) {
+        twttr.widgets.createFollowButton(
+          'JamesCherished', // Your Twitter handle
+          document.querySelector('.twitter-follow-container'),
+          { size: 'large' }
+        );
+     } else {
+        // If twttr is not yet available, wait for it
+        window.twttr_events = window.twttr_events || [];
+        window.twttr_events.push(() => {
+            twttr.widgets.createFollowButton(
+              'JamesCherished', // Your Twitter handle
+              document.querySelector('.twitter-follow-container'),
+              { size: 'large' }
+            );
+        });
+     }
+   }
+
+   const filtersContent = document.getElementById('filters-content');
+
    if (toggleFiltersBtn && filtersContent) {
      toggleFiltersBtn.addEventListener('click', () => {
        filtersContent.classList.toggle('collapsed');

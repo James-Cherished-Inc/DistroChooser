@@ -52,8 +52,9 @@ The project aims to provide a comprehensive tool for users to choose a Linux dis
 - [x] Implement priority sliders for filter controls
 - [ ] Export/import functionality
 - [x] Recommendation engine
+- [x] Author Information Panel
 - [ ] Accessibility features
-- [ ] Performance optimizations
+- [x] Performance optimizations - Implemented session-only persistence to improve privacy and reduce storage overhead
 - [ ] Improve mobile responsiveness
 - [ ] Expand test coverage
 
@@ -148,6 +149,7 @@ This architecture ensures that the filter system is both powerful and intuitive,
 (Note: This section will be updated as dependencies are added, e.g., for API integration or ML.)
  
 ## Decisions and Tech Choices
+* Added author information panel using vanilla JS for consistency with existing tech stack, ensuring lightweight and fast implementation without additional frameworks.
  
 *   **Frontend:** Vanilla JavaScript was chosen for simplicity and performance, avoiding framework overhead for this initial version.
 *   **Data Structure:** JSON5 format was chosen for the data template due to its flexibility and human-readability.

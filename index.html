@@ -8,6 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <link rel="stylesheet" href="author-panel.css?v=5">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="distro-comparison-container">
@@ -17,6 +21,7 @@
                 <div class="filters-header">
                     <h2>Detailed Filters<span id="header-stats"></span></h2>
                     <button id="toggleFiltersBtn" class="toggle-btn">▼</button>
+                    <button id="authorPanelBtn" class="author-btn">About</button>
                 </div>
                 <div id="filters-content">
 
@@ -40,49 +45,10 @@
                     </div>
                 </div>
 
-                <div class="filter-category subsection" id="non-negotiable-section">
-                    <div class="subsection-header">
-                        <h3>NON-NEGOTIABLE CRITERIA</h3>
-                        <button class="subsection-toggle-btn">▼</button>
-                    </div>
-                    <div class="subsection-content">
-                        <div class="filter-placeholder" id="non-negotiable-criteria-filters"></div>
-                    </div>
-                </div>
-
-                <div class="filter-category subsection" id="important-criteria-section">
-                    <div class="subsection-header">
-                        <h3>IMPORTANT CRITERIA</h3>
-                        <button class="subsection-toggle-btn">▼</button>
-                    </div>
-                    <div class="subsection-content">
-                        <div class="filter-placeholder" id="important-criteria-filters"></div>
-                    </div>
-                </div>
-
-                <div class="filter-category subsection" id="nice-to-have-section">
-                    <div class="subsection-header">
-                        <h3>NICE-TO-HAVE CRITERIA</h3>
-                        <button class="subsection-toggle-btn">▼</button>
-                    </div>
-                    <div class="subsection-content">
-                        <div class="filter-placeholder" id="nice-to-have-criteria-filters"></div>
-                    </div>
-                </div>
-
-                <div class="filter-category subsection" id="detailed-specifications-section">
-                    <div class="subsection-header">
-                        <h3>DETAILED SPECIFICATIONS</h3>
-                        <button class="subsection-toggle-btn">▼</button>
-                    </div>
-                    <div class="subsection-content">
-                        <div class="filter-placeholder" id="detailed-specifications-filters"></div>
-                    </div>
-                </div>
 
                 <div class="filter-category subsection" id="security-privacy-section">
                     <div class="subsection-header">
-                        <h3>SECURITY & PRIVACY</h3>
+                        <h3>Security & Privacy</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -92,7 +58,7 @@
 
                 <div class="filter-category subsection" id="hardware-compatibility-section">
                     <div class="subsection-header">
-                        <h3>HARDWARE COMPATIBILITY</h3>
+                        <h3>Hardware Compatibility</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -102,7 +68,7 @@
 
                 <div class="filter-category subsection" id="performance-metrics-section">
                     <div class="subsection-header">
-                        <h3>PERFORMANCE METRICS</h3>
+                        <h3>Performance Metrics</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -112,7 +78,7 @@
 
                 <div class="filter-category subsection" id="usability-section">
                     <div class="subsection-header">
-                        <h3>USABILITY</h3>
+                        <h3>Usability</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -122,7 +88,7 @@
 
                 <div class="filter-category subsection" id="development-professional-use-section">
                     <div class="subsection-header">
-                        <h3>DEVELOPMENT & PROFESSIONAL USE</h3>
+                        <h3>Development & Professional Use</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -132,7 +98,7 @@
 
                 <div class="filter-category subsection" id="multimedia-creativity-section">
                     <div class="subsection-header">
-                        <h3>MULTIMEDIA & CREATIVITY</h3>
+                        <h3>Multimedia & Creativity</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -142,7 +108,7 @@
 
                 <div class="filter-category subsection" id="accessibility-section">
                     <div class="subsection-header">
-                        <h3>ACCESSIBILITY</h3>
+                        <h3>Accessibility</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -152,7 +118,7 @@
 
                 <div class="filter-category subsection" id="localization-section">
                     <div class="subsection-header">
-                        <h3>LOCALIZATION</h3>
+                        <h3>Localization</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -162,7 +128,7 @@
 
                 <div class="filter-category subsection" id="community-ecosystem-section">
                     <div class="subsection-header">
-                        <h3>COMMUNITY & ECOSYSTEM</h3>
+                        <h3>Community & Ecosystem</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -172,7 +138,7 @@
 
                 <div class="filter-category subsection" id="special-features-section">
                     <div class="subsection-header">
-                        <h3>SPECIAL FEATURES</h3>
+                        <h3>Special Features</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -182,7 +148,7 @@
 
                 <div class="filter-category subsection" id="maintenance-section">
                     <div class="subsection-header">
-                        <h3>MAINTENANCE</h3>
+                        <h3>Maintenance</h3>
                         <button class="subsection-toggle-btn">▼</button>
                     </div>
                     <div class="subsection-content">
@@ -250,10 +216,61 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/json5@2.2.3/dist/index.min.js"></script>
-    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+    <script type="module" src="script.js"></script>
 <div id="scroll-arrows">
   <button id="scroll-to-top">↑ Top</button>
   <button id="scroll-to-bottom">↓ Bottom</button>
 </div>
+
+    <!-- Author details panel -->
+    <div id="author-panel-overlay" class="author-panel-overlay">
+      <div class="author-panel-content">
+        <button class="close-btn">×</button>
+        <div class="author-info">
+          <img src="James_Photo.jpg" alt="Sir James Cherished" class="author-photo">
+          <h3>Sir James Cherished</h3>
+          <p>Passionate developer building open-source tools</p>
+        </div>
+        <div class="user-guide-section">
+          <h3>About Me</h3>
+          <div class="user-guide-content">
+            <p>Hi, I'm James! I hope you're enjoying the tools I build.</p>
+            <p>I'm a solo dev and a new Linux fan.</p>
+            <p>If you find some value in the time, money and effort I've spent towards my vision, I'm glad. I'm driven by the idea of an equitable chance to anyone on Earth to freely pursue their dreams and fulfillment, for free. An Internet connection as the single requirement brings this truer and truer with each effort.</p>
+            <p>Linux contributes to this realization and I hope this can be a small gift to the community.</p>
+          </div>
+        </div>
+        <div class="donation-section">
+          <a href="https://x.com/JamesCherished" target="_blank" rel="noopener noreferrer" class="donate-btn animated-link support-link">Support My Work</a>
+        </div>
+<!-- deleted because: duplicate "About Me" section, keeping only the first instance for content deduplication -->
+        <div class="why-section">
+          <h3>Why a Cherished-DistroChooser?</h3>
+          <div class="why-content">
+            <p>Arguably, choosing your Distro is one of the most fun thing about Linux. It's also one of the best way for newbies to learn about technicalities, a good reason to dive the rabbit hole and uncover its history. The existing distro chosers did not meet my needs, and I built this just for myself. A nice, filterable, exhaustive table allows me a tailored selection and quick glances to select the right choice for my different needs.</p>
+            <p>Linux Community is welcome to contribute. You can request or add a new distribution, correct mistakes or add relevant context/information for a data point, and even argue about calculation methods :) DM me on X or join the debate on Github.</p>
+          </div>
+        </div>
+        <div class="contribute-section">
+          <a href="https://github.com/James-Cherished-Inc/DistroChoser" target="_blank" rel="noopener noreferrer" class="donate-btn contribute-btn">Contribute</a>
+        </div>
+        <div class="social-footer">
+          <a href="https://www.reddit.com/user/James_Cherished" target="_blank" rel="noopener noreferrer" class="social-btn reddit">
+            <i class="fab fa-reddit-alien fa-2x"></i>
+          </a>
+          <a href="https://github.com/James-Cherished" target="_blank" rel="noopener noreferrer" class="social-btn github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+          <a href="https://x.com/JamesCherished.com" target="_blank" rel="noopener noreferrer" class="social-btn website">
+            <i class="fas fa-globe fa-2x"></i>
+          </a>
+          <a href="https://x.com/JamesCherished" target="_blank" rel="noopener noreferrer" class="social-btn x">
+            <i class="fab fa-x-twitter fa-2x"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
 </body>
 </html>

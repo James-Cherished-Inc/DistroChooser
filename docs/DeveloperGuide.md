@@ -253,6 +253,13 @@ graph TD
 
 This diagram provides a high-level overview of how the different parts of the application work together.
 
+## Session State Management
+* Implemented session-only persistence for application state
+* Created `SessionState.js` to explicitly prevent client-side storage
+* Added `beforeunload` event listener in `script.js` to clear state on page unload
+* Added ESLint rule to prevent accidental usage of `localStorage` and `sessionStorage`
+* Updated documentation to reflect session-only behavior
+
 ## Recommendation Engine
 
 A detailed plan for the Recommendation Engine implementation has been created. This engine will calculate a weighted score for each distribution based on user-defined filter priorities ("Nice-to-Have" and "Important") and the degree to which a distribution matches the selected criteria values. Distributions that do not meet "Non-negotiable" criteria will be excluded.

@@ -51,4 +51,13 @@ The interactive table is the core of the Linux Distro Chooser.
 4.  **Eliminating Distributions:** Use the "❌ Eliminate" button in the "Actions" column to hide a specific distribution from the table.
 5.  **Viewing Details:** Use the "ℹ️ Details" button in the "Actions" column to view a modal with more detailed information about a distribution, including system requirements and detailed scoring.
 
+## Session Behavior
+
+- All application state (filtered distributions, eliminated distributions, filter settings) is stored only in memory for the current session.
+- State is cleared when:
+  - The page is refreshed.
+  - The browser tab or window is closed.
+  - Browser cache is cleared.
+- No personal data or application state is stored persistently on your device.
+
 We hope this tool helps you find the perfect Linux distribution for your needs!

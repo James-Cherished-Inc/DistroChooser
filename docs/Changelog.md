@@ -215,3 +215,38 @@ The filter controls now feature interactive sliders for each setting, providing 
 * Descriptions loaded from data/template_descriptions.json
 * Added CSS styling for help icons
 * Updated script.js to load descriptions and create tooltips
+
+## [14/06/2025, 4:43:00 pm (Europe/Madrid)] Added Author Information Panel
+* Implemented an expandable right panel for author information, including bio, donation link, and X follow widget.
+* Added new CSS file for styling and modified index.html and script.js for functionality.
+* Fixed variable redeclaration issue in script.js to ensure code integrity.
+
+### Files Modified:
+- [`index.html`](index.html)
+- [`script.js`](script.js)
+- [`author-panel.css`](author-panel.css) (New file created)
+
+## [{{CURRENT_DATE}}, {{CURRENT_TIME}}] Implemented Session-Only Persistence
+* Ensured application state (filters, eliminated distros) is not persisted between sessions.
+* Created `SessionState.js` to explicitly prevent client-side storage.
+* Added `beforeunload` event listener in `script.js` to clear state on page unload.
+* Added ESLint rule to prevent accidental usage of `localStorage` and `sessionStorage`.
+* Updated documentation to reflect session-only behavior.
+
+### Files Modified:
+- [`SessionState.js`](SessionState.js) (New file created)
+- [`script.js`](script.js)
+- [`.eslintrc.json`](.eslintrc.json) (New file created)
+- [`README.md`](README.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+
+### 15/06/2025
+- Updated author panel with new features:
+  - Added "Why Cherished-DistroChooser?" section
+  - Added Contribute button linking to GitHub repo
+  - Added social footer with Reddit, GitHub, Website and X links
+  - Made "About" button 30% larger for better visibility
+  - Fixed XSS vulnerability by removing insecure innerHTML assignment
+  - Improved text readability with better line spacing
