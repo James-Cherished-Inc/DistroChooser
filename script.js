@@ -1339,13 +1339,13 @@ document.getElementById('scroll-to-bottom').addEventListener('click', () => {
          }
          return response.text();
        })
-       .then(text => {
-         const authorBio = document.getElementById('author-bio');
-         if (authorBio) {
-           authorBio.innerHTML = text; // Basic text insertion
-         } else {
-           console.error("Author bio element not found.");
-         }
+       // .then(text => {
+       //   const authorBio = document.getElementById('author-bio');
+       //   if (authorBio) {
+       //     authorBio.innerHTML = text; // Basic text insertion
+       //   } else {
+       //     console.error("Author bio element not found.");
+       //   }
        })
        .catch(error => {
          console.error("Error fetching author bio:", error);
