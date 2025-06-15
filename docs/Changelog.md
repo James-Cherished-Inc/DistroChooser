@@ -241,3 +241,12 @@ The filter controls now feature interactive sliders for each setting, providing 
 - [`docs/Changelog.md`](docs/Changelog.md)
 - [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
 - [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+
+### 15/06/2025
+- Updated author panel with new features:
+  - Added "Why Cherished-DistroChooser?" section
+  - Added Contribute button linking to GitHub repo
+  - Added social footer with Reddit, GitHub, Website and X links
+  - Made "About" button 30% larger for better visibility
+  - Fixed XSS vulnerability by removing insecure innerHTML assignment
+  - Improved text readability with better line spacing
