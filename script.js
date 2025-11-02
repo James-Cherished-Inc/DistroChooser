@@ -5,6 +5,7 @@ class DistroComparator {
     this.allDistros = []; // Load from comprehensive database
     this.filteredDistros = [];
     this.eliminatedDistros = new Set();
+    this.addedDistros = []; // Array to preserve insertion order for manually added distros (latest unshifted to top)
     this.currentFilters = {
       nonNegotiable: false,
       important: false,
@@ -683,6 +684,21 @@ class DistroComparator {
         this.currentFilters.attributeFilters[name] = val;
       });
 
+      // Summary filters moved inside rAF for proper scope (no-op now, as moved)
+
+      // Prepend manually added distros at the top, with recalculated scores (bypassing current filters for comparison)
+      const addedList = this.addedDistros.map(name => {
+        const distro = this.allDistros.find(d => d.name === name);
+        if (distro && !this.eliminatedDistros.has(name)) {
+          // Recalculate scores using current filters for accurate comparison
+          distro.recommendationScore = this.calculateRecommendationScore(distro);
+          return distro;
+        }
+        return null;
+      }).filter(d => d !== null);
+
+      list = [...addedList, ...list];
+
       this.filteredDistros = list;
       this.filteredDistros.forEach(d => d.recommendationScore = this.calculateRecommendationScore(d));
       this.sortDistros();
@@ -996,7 +1012,10 @@ class DistroComparator {
 
   // Eliminate distribution from comparison
   eliminateDistro(distroName) {
-     // ADD THIS LINE
+    // Remove from addedDistros if present
+    if (this.addedDistros.includes(distroName)) {
+      this.addedDistros = this.addedDistros.filter(n => n !== distroName);
+    }
     this.eliminatedDistros.add(distroName);
     this.filterDistros();
     this.showNotification(`${distroName} eliminated from comparison`);
@@ -1104,22 +1123,37 @@ class DistroComparator {
     
   }
 
+  // Add a distro to manually added list for comparison (unshift for latest at top)
+  addDistro(name) {
+    const match = this.allDistros.find(d => d.name === name);
+    if (!match) {
+      this.showNotification(`Distro "${name}" not found.`);
+      return;
+    }
+    if (this.eliminatedDistros.has(name) || this.addedDistros.includes(name)) {
+      this.showNotification(`Distro "${name}" is already ${this.eliminatedDistros.has(name) ? 'eliminated' : 'added'}.`);
+      return;
+    }
+    this.addedDistros.unshift(name); // Unshift to add latest at the beginning (top after prepend)
+    this.filterDistros();
+  }
+
   // Show a simple notification (can be enhanced later)
   showNotification(message) {
-    
-    // For a more user-friendly notification, you might want to create a temporary element on the page
-    // or use a library. For now, a console log will suffice for debugging.
-    // Example of a simple on-page notification:
-    /*
-    const notificationElement = document.createElement('div');
-    notificationElement.className = 'notification';
-    notificationElement.textContent = message;
-    document.body.appendChild(notificationElement);
-    setTimeout(() => {
-      notificationElement.remove();
-    }, 3000);
-    */
-  }
+
+     // For a more user-friendly notification, you might want to create a temporary element on the page
+     // or use a library. For now, a console log will suffice for debugging.
+     // Example of a simple on-page notification:
+     /*
+     const notificationElement = document.createElement('div');
+     notificationElement.className = 'notification';
+     notificationElement.textContent = message;
+     document.body.appendChild(notificationElement);
+     setTimeout(() => {
+       notificationElement.remove();
+     }, 3000);
+     */
+   }
 
   // Update slider label highlighting
   updateSliderLabel(labelsContainer, value) {
@@ -1255,6 +1289,30 @@ document.addEventListener('DOMContentLoaded', () => {
         console.time('setTimeout renderFilterControls'); // Start timer for setTimeout callback
         app.renderFilterControls();
         console.timeEnd('setTimeout renderFilterControls'); // End timer for setTimeout callback
+
+        // Add input UI above table after renderFilterControls
+        const distributionsSection = document.getElementById('distributions');
+        const tableContainer = document.getElementById('table-container');
+        if (distributionsSection && tableContainer) {
+          const inputContainer = document.createElement('div');
+          inputContainer.id = 'add-distro-input-container';
+          inputContainer.style.display = 'flex';
+          inputContainer.style.alignItems = 'center';
+          inputContainer.style.gap = '5px';
+          inputContainer.style.padding = '10px';
+          inputContainer.style.background = '#f8f9fa';
+          inputContainer.style.marginBottom = '10px';
+          inputContainer.innerHTML = '<label for="addDistroInput">Re-add a filtered out Distro:</label><select id="addDistroInput" placeholder="Select distro..."></select>';
+          distributionsSection.insertBefore(inputContainer, tableContainer);
+          // Initialize TomSelect
+          const tomSelect = new TomSelect('#addDistroInput', {
+            options: app.allDistros.map(d => ({value: d.name, text: d.name})),
+            maxItems: 1,
+            maxOptions: 56,
+            placeholder: 'Select distro...',
+            onChange: (value) => { const name = Array.isArray(value) ? value[0] : value; if (name) { app.addDistro(name); tomSelect.clear(); } }
+          });
+        }
     }, 0);
     // Apply initial filter based on current state
     console.log('Calling initial filterDistros');

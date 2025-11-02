@@ -672,26 +672,27 @@ input.control-number::-moz-range-track {
 }
 
 #scroll-arrows button {
-  /* Increased width for better visibility and user preference */
-  width: 70px; /* Adjusted from 50px to 70px to make buttons wider */
+  width: 100px;
   height: 50px;
   border: none;
-  /* Changed to elongated ellipse for better UI aesthetics as per user request */
-  border-radius: 50% / 30%; /* Elliptical shape with vertical elongation */
-  background-color: #007bff;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s, transform 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  outline: none;
 }
 
 #scroll-arrows button:hover {
-  background-color: #0056b3;
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 /* Custom tooltip styles */
@@ -736,7 +737,8 @@ input.control-number::-moz-range-track {
 }
 
 #scroll-arrows button:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 /* Help icon styles */
 .filter-attribute .help-icon {

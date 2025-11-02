@@ -1,0 +1,7 @@
+# Dependencies for Cherished Linux Distro Chooser
+
+# Frontend dependencies (via CDN):
+# - Tom Select (v2.3.1): Enhanced dropdown library from https://tom-select.com/
+
+# Python dependencies for data processing scripts:
+# (None currently - scripts like data/extract_json.py use built-in modules only)

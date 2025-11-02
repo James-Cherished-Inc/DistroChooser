@@ -4,6 +4,7 @@
   },
   "scripts": {
     "start": "node scripts/start-cors-proxy.js & python3 -m http.server 7000 & open http://localhost:7000/index.html",
-    "dev": "python3 -m http.server 7001"
+    "dev": "python3 -m http.server 7001",
+    "docs:toc": "doctoc docs/*.md"
   }
 }

@@ -1,7 +1,10 @@
+# Public Upload
+docs/further-ideas.md
+.roomodes
+
+docs/GenesisPrompt.md
 # Gitignore for Distro project
 data/rooresearcher
-SettingsPanel.css
-SettingsPanel.js
 
 # Python
 # Virtual environment
