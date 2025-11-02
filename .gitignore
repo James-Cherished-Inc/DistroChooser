@@ -1,5 +1,8 @@
 .roomodes
 
+# Public Upload
+docs/further-ideas.md
+docs/GenesisPrompt.md
 # Gitignore for Distro project
 data/rooresearcher
 
@@ -24,7 +27,6 @@ yarn-error.log*
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
 yarn-error.log*
 
 # OS generated files

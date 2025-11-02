@@ -46,7 +46,7 @@
   "support_duration_years": 3,
   "update_frequency": "weekly",
   "privacy_rating": 9,
-  "security_rating": 9,
+  "security_rating": 10,
   "firewall_default": true,
   "firewall": true,
   "encryption_support": true,
