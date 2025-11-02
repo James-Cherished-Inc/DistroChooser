@@ -21,13 +21,14 @@ The current version of the Linux Distro Chooser provides the following features:
 *   **Interactive Table:** Displays a list of Linux distributions with various criteria.
 *   **Criteria-based Filtering:** Filter distributions based on Non-Negotiable, Important, and Nice-to-Have criteria priorities.
 *   **Distribution Elimination:** Users can hide distributions from the table that do not meet their requirements.
+*   **Re-add Filtered Out Distro:** Use the dropdown above the table to re-add a previously filtered distro for comparison; it appears at the top with light highlight, full actions (Details, Eliminate), and recalculated scores based on current filters.
 *   **Detailed Information:** View more detailed specifications and scores for each distribution.
-*   Export/Import functionality for user preferences and filtered lists.
+*   **Sorting:** Sort the table by different criteria columns.
 *   Retractable Supra-columns, inspired by https://artificialanalysis.ai/
 
 ### Planned Features
 
-*   **Sorting:** Sort the table by different criteria columns.
+*   Export/Import functionality for user preferences and filtered lists.
 *   An AI-powered recommendation engine to suggest distributions based on user input.
 *   Performance optimizations for handling larger datasets.
 *   Enhanced accessibility features for a wider range of users.
@@ -38,9 +39,10 @@ The interactive table is the core of the Linux Distro Chooser.
 
 1.  **Viewing Distributions:** All available distributions are listed in the table, with columns representing different criteria.
 2.  **Filtering:** Use the checkboxes at the top of the page to apply filters based on criteria priorities (Non-Negotiable, Important, Nice-to-Have). Checking a box will hide distributions that do not meet *all* criteria within that priority level.
-3.  **Sorting:** Click on the column headers to sort the table based on that criterion's score or value.
-4.  **Eliminating Distributions:** Use the "❌ Eliminate" button in the "Actions" column to hide a specific distribution from the table.
-5.  **Viewing Details:** Use the "ℹ️ Details" button in the "Actions" column to view a modal with more detailed information about a distribution, including system requirements and detailed scoring.
+3.  **Re-adding Filtered Distros:** Above the table, use the "Re-add a filtered out Distro:" dropdown to select a distro name; it will be added to the top of the table (light blue highlight) for comparison, with scores recalculated based on current filters. Persists until page reload or elimination.
+4.  **Sorting:** Click on the column headers to sort the table based on that criterion's score or value.
+5.  **Eliminating Distributions:** Use the "❌ Eliminate" button in the "Actions" column to hide a specific distribution from the table.
+6.  **Viewing Details:** Use the "ℹ️ Details" button in the "Actions" column to view a modal with more detailed information about a distribution, including system requirements and detailed scoring.
 
 
 ## Session Behavior
@@ -90,3 +92,64 @@ To get started with the Linux Distro Chooser, simply open the `index.html` file 
 1.  Clone the repository 
 2.  Navigate to the project directory.
 3.  npm start will concurrently start the backend and the frontend, and open it in your browser.
+
+## List of Currently Supported Distros (as of June 25) : 56
+
+The Cherished Linux Distro Chooser currently supports the following 56 distributions, each meticulously curated and verified for accuracy. This list is derived from our comprehensive database and is presented in alphabetical order for easy reference:
+
+- 4MLinux
+- AlmaLinux
+- Alpine Linux
+- antiX
+- Arch Linux
+- ArcoLinux
+- Artix Linux
+- BlackArch
+- Bodhi Linux
+- CentOS Stream
+- Clear Linux
+- Container Linux
+- Deepin
+- DietPi
+- Elementary OS
+- EndeavourOS
+- Endless OS
+- Fedora
+- Funtoo
+- Garuda Linux
+- Gentoo
+- Kali Linux
+- KaOS
+- KDE Neon
+- KXStudio
+- Linux Mint
+- LXLE
+- Mageia
+- Manjaro
+- MX Linux
+- MX Linux Variants
+- Netrunner
+- NixOS
+- OpenMandriva
+- openSUSE
+- Oracle Linux
+- OSGeoLive
+- Parrot Security OS
+- PCLinuxOS
+- Peppermint OS
+- Pop!_OS
+- Porteus
+- Puppy Linux
+- Qubes OS
+- Red Hat Enterprise Linux
+- Rocky Linux
+- Slackware
+- Slax
+- Solus
+- SparkyLinux
+- SUSE Linux Enterprise
+- Tails
+- Ubuntu
+- Ubuntu Server
+- Void Linux
+- Zorin OS

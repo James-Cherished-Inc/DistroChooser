@@ -226,7 +226,6 @@ The filter controls now feature interactive sliders for each setting, providing 
 - [`script.js`](script.js)
 - [`author-panel.css`](author-panel.css) (New file created)
 
-## [{{CURRENT_DATE}}, {{CURRENT_TIME}}] Implemented Session-Only Persistence
 * Ensured application state (filters, eliminated distros) is not persisted between sessions.
 * Created `SessionState.js` to explicitly prevent client-side storage.
 * Added `beforeunload` event listener in `script.js` to clear state on page unload.
@@ -252,3 +251,26 @@ The filter controls now feature interactive sliders for each setting, providing 
   - Improved text readability with better line spacing
 
 ## `16/06/2025` - Expanded the "Contributing" section in `README.md` to provide detailed guidelines for contributions related to distro information, UI, performance, and backend. Included information about the project creator and a link to support their work on X (Twitter).
+
+## [2025-09-06, 21:39:00 (Europe/Madrid)] Add Filtered Distro Feature Implementation and Bug Fix
+* Problem solved: Selecting a distro in the TomSelect dropdown did not add it to the table for comparison, due to missing prepending logic, sorting priority, and row highlighting.
+* How decided: After reading script.js, identified incomplete implementation; fixed by changing addedDistros to array for order, implementing prepend in filterDistros with score recalc, adding sort priority for added at top, row class in renderTable, and remove from added in eliminateDistro. Confirmed via multiple diffs.
+* Implications: Enables users to re-add filtered distros for side-by-side comparison, improving UX for exploration; maintains session-only state; no perf impact as lightweight.
+* What's been implemented: addDistro method with exact match and unshift, UI append with onChange trigger, integrations in filterDistros (prepend addedList), sortDistros (priority comparator), renderTable (added-row class), eliminateDistro (filter out).
+* Changes made to code logic: Modified constructor (array), addDistro (includes/unshift), filterDistros (moved summary inside rAF, prepend after detailed), sortDistros (added isAdded check before normal sort), renderTable (row.classList.add if includes), eliminateDistro (filter before add eliminated).
+* Solution to bug: Scoped summary filters inside requestAnimationFrame to fix undefined 'list'; ensured onChange handles array/single value.
+### Files Modified:
+- [`script.js`](script.js)
+- [`docs/Changelog.md`](docs/Changelog.md)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`README.md`](README.md)
+
+## [2025-09-06, 21:46:00 (Europe/Madrid)] Documentation Enhancements for Data Loading and Structure
+* Enhanced [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md) with a new "Data Loading and Structure" section (inserted after Project Structure, lines 5-280 updated): Explained file roles (individual JSONs for modularity, index.md for reference, template.json5 for schema), runtime behavior (loadDistrosFromJSON() with code snippet from script.js lines 419-502), and distributed design rationale (ease of contributions, note on compile_distros.py alternative). Included Mermaid diagram for data flow visualization.
+* Updated Tech Stack section in [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md) (line 142): Added "Data Management: Modular JSONs loaded via async fetches for simplicity in static app. Planned: Dynamic discovery to avoid hardcoding."
+* No code changes; focused on documentation accuracy and completeness to aid future maintainers and contributors.
+### Files Modified:
+- [`docs/DeveloperGuide.md`](docs/DeveloperGuide.md)
+- [`docs/MasterImplementationPlan.md`](docs/MasterImplementationPlan.md)
+- [`docs/Changelog.md`](docs/Changelog.md)
